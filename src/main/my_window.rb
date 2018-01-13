@@ -1,18 +1,17 @@
 require 'gosu'
 require '../../src/obj/chars/mc'
 require '../../src/obj/game_states'
+require '../../src/obj/map/main_map'
+
 class MyWindow < Gosu::Window
 
   def initialize
     super 640, 480, update_interval: 1000/$FPS
     self.caption = 'Hello World!'
-    begin
-      @background_imga = Gosu::Image.new("../../assets/sprites/Mapas/RealZone1.png", retro:true)
-      @player = Mc.new
-      @player.warp(100, 100)
-    rescue Exception => e
-      puts e.to_s
-    end
+    @bg_map = MainMap.new
+    @player = Mc.new
+    @player.warp(100, 100)
+
   end
 
   def button_down(id)
@@ -45,9 +44,9 @@ class MyWindow < Gosu::Window
   end
 
   def draw
-    Gosu.scale(3, 3){
+    Gosu.scale(3, 3) {
+      @bg_map.draw
       @player.draw
-      @background_imga.draw(0, 0, 0)
     }
   end
 end
