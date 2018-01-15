@@ -8,7 +8,8 @@ class MyWindow < Gosu::Window
   def initialize
     super 800, 600, update_interval: 1000/$FPS
     self.caption = 'Hello World!'
-    @bg_map = MainMap.new
+    $CURRENT_MAP = MainMap.new
+    puts $CURRENT_MAP.solid_tiles.count
     @player = Mc.new
     @player.warp(100, 100)
 
@@ -34,7 +35,6 @@ class MyWindow < Gosu::Window
     if [Gosu::KB_LEFT, Gosu::KB_RIGHT, Gosu::KB_UP, Gosu::KB_DOWN].include? id
       @player.change_move_state(GameStates::Action::RELEASE)
     end
-    puts "BUTTON RELEASED"
   end
 
   def update
@@ -45,8 +45,9 @@ class MyWindow < Gosu::Window
 
   def draw
     Gosu.scale(3, 3) {
-      @bg_map.draw
+      $CURRENT_MAP.draw
       @player.draw
+      #Gosu::Font.new(10).draw(Gosu.fps,2,2,2,1,1,$COLOR_BLUE)
     }
   end
 end

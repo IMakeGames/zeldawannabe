@@ -1,8 +1,7 @@
 require '../../src/obj/game_states'
 
 class Char
-  attr_accessor :state
-  attr_accessor :face_dir
+  attr_accessor :state, :face_dir, :x, :y, :w, :h, :sprite_offset_x, :sprite_offset_y
 
   def initialize
     @state =  GameStates::States::IDLE
@@ -28,7 +27,6 @@ class Char
 
   def change_move_state(action)
     if action == GameStates::Action::PRESS && self.idle?
-      puts "STATED MOVING"
       @state = GameStates::States::MOVING
     elsif action == GameStates::Action::RELEASE && self.moving?
       @state = GameStates::States::IDLE

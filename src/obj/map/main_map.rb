@@ -2,6 +2,7 @@ require '../../src/obj/map/map_tile'
 class MainMap
   TILE_WIDTH = 12
   TILE_HEIGHT = 12
+  attr_accessor :solid_tiles
 
   def initialize
     @map_sprites = Gosu::Image.load_tiles("../../assets/sprites/Mapas/forest_floor_tiles.png", TILE_WIDTH, TILE_HEIGHT, retro: true)
@@ -59,11 +60,13 @@ class MainMap
 
 
     @map_tiles = []
+    @solid_tiles = []
 
     f = File.open("../../src/obj/map/map1_layout.txt")
     f.each_with_index do |line, y|
       @line = []
       line.split(",").each_with_index do |n, x|
+        solid = false
         case n
           when '1'
             sprite_to_set = @plain
@@ -73,6 +76,7 @@ class MainMap
             sprite_to_set = @plain_s
           when '4'
             sprite_to_set = @stone
+            solid = true
           when '5'
             sprite_to_set = @flowers
           when '6'
@@ -105,20 +109,28 @@ class MainMap
             sprite_to_set = @dirtR2
           when 'k'
             sprite_to_set = @hwall1
+            solid = true
           when 'l'
             sprite_to_set = @hwall2
+            solid = true
           when 'm'
             sprite_to_set = @vwall1
+            solid = true
           when 'n'
             sprite_to_set = @vwall2
+            solid = true
           when 'o'
             sprite_to_set = @BRwallc
+            solid = true
           when 'p'
             sprite_to_set = @LBwallc
+            solid = true
           when 'q'
             sprite_to_set = @vwallr1
+            solid = true
           when 'r'
             sprite_to_set = @vwallr2
+            solid = true
           when 's'
             sprite_to_set = @walldt
           when 't'
@@ -129,28 +141,40 @@ class MainMap
             sprite_to_set = @walldbr
           when 'w'
             sprite_to_set = @Thedge1
+            solid = true
           when 'x'
             sprite_to_set = @Thedge2
+            solid = true
           when 'y'
             sprite_to_set = @Lhedge1
+            solid = true
           when 'z'
             sprite_to_set = @Lhedge2
+            solid = true
           when 'A'
             sprite_to_set = @Rhedge1
+            solid = true
           when 'B'
             sprite_to_set = @Rhedge2
+            solid = true
           when 'C'
             sprite_to_set = @Bhedge1
+            solid = true
           when 'D'
             sprite_to_set = @Bhedge2
+            solid = true
           when 'E'
             sprite_to_set = @BRhedgec
+            solid = true
           when 'F'
             sprite_to_set = @LBhedgec
+            solid = true
           when 'G'
             sprite_to_set = @TRhedgec
+            solid = true
           when 'H'
             sprite_to_set = @LThedgec
+            solid = true
           when 'I'
             sprite_to_set = @underbrush1
           when 'J'
@@ -165,7 +189,11 @@ class MainMap
             sprite_to_set = @tree4
         end
         if !sprite_to_set.nil?
-          @line << MapTile.new(sprite_to_set, x*TILE_WIDTH, y*TILE_HEIGHT)
+          new_tile = MapTile.new(sprite_to_set, x*TILE_WIDTH, y*TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT, solid)
+          @line << new_tile
+          if solid
+            @solid_tiles << new_tile
+          end
         end
       end
       @map_tiles << @line
