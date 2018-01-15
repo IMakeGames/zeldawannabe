@@ -1,19 +1,26 @@
 require 'gosu'
 require '../../src/obj/chars/mc'
+require '../../src/obj/chars/wolf'
 require '../../src/obj/game_states'
 require '../../src/obj/map/main_map'
 
 class MyWindow < Gosu::Window
+  attr_reader :fps, :draw_hb, :color_red, :color_blue, :color_yellow, :w_height, :w_width, :player, :current_map
+  WINDOW_HEIGHT = 600
+  WINDOW_WIDTH = 800
 
   def initialize
-    super $WINDOW_WIDTH, $WINDOW_HEIGHT, update_interval: 1000/$FPS
-    @half_screen_height = (($WINDOW_HEIGHT/3)/2).ceil
-    @half_screen_width = (($WINDOW_WIDTH/3)/2).ceil
+    @fps = 60
+    @draw_hb = true
+    @color_red = Gosu::Color.argb(0xff_ff0000)
+    @color_blue = Gosu::Color.argb(0xff_0000ff)
+    @color_yellow = Gosu::Color.argb(0xff_ffff00)
+    super WINDOW_WIDTH, WINDOW_HEIGHT, update_interval: 1000/@fps
+    @half_screen_height = ((WINDOW_HEIGHT/3)/2).ceil
+    @half_screen_width = ((WINDOW_WIDTH/3)/2).ceil
+    @map_offsetx = 0
+    @map_offsety = 0
     self.caption = 'Hello World!'
-    $CURRENT_MAP = MainMap.new
-    puts $CURRENT_MAP.solid_tiles.count
-    @player = Mc.new
-    @player.warp(100, 100)
   end
 
   def button_down(id)
@@ -39,27 +46,38 @@ class MyWindow < Gosu::Window
   end
 
   def update
-    if @player.moving?
-      @player.move
-    end
+    #PLAYER UPDATE
+    @player.update
 
+    #NPC UPDATE
+    @wolf.update
+
+    #WINDOW SCROLLING
     if @player.y > @half_screen_height
-
-      $map_offsety = (@half_screen_height - @player.y)*3
+      @map_offsety = (@half_screen_height - @player.y)*3
     end
     if @player.x > @half_screen_width
-
-      $map_offsetx = (@half_screen_width - @player.x)*3
+      @map_offsetx = (@half_screen_width - @player.x)*3
     end
   end
 
   def draw
-    Gosu.translate($map_offsetx, $map_offsety){
-    Gosu.scale(3, 3) {
-      $CURRENT_MAP.draw
-      @player.draw
-      #Gosu::Font.new(10).draw(Gosu.fps,2,2,2,1,1,$COLOR_BLUE)
+    Gosu.translate(@map_offsetx, @map_offsety) {
+      Gosu.scale(3, 3) {
+        @current_map.draw
+        @player.draw
+        @wolf.draw
+        #Gosu::Font.new(10).draw(Gosu.fps,2,2,2,1,1,$COLOR_BLUE)
+      }
     }
-    }
+  end
+
+  def init_objects
+    @current_map = MainMap.new
+    puts @current_map.solid_tiles.count
+    @wolf = Wolf.new
+    @player = Mc.new
+    @player.place(100, 100)
+    @wolf.place(120,120)
   end
 end

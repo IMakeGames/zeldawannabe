@@ -14,13 +14,13 @@ class MapTile
 
   def draw
     @img.draw(@x, @y, 1)
-    if @solid && $DRAW_HB
+    if @solid && $WINDOW.draw_hb
       if @impact
-        draw_with = $COLOR_YELLOW
+        draw_with = $WINDOW.color_yellow
         @impact = false
         @hb_z = 3
       else
-        draw_with = $COLOR_RED
+        draw_with = $WINDOW.color_red
         @hb_z = 2
       end
       Gosu.draw_line(@x, @y, draw_with, @x + @w, @y, draw_with, @hb_z)

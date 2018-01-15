@@ -16,8 +16,19 @@ class Mc < Char
     @sprite_offset_y = -9
   end
 
-  def warp(x, y)
-    @x, @y = x, y
+  def update
+    if moving?
+      move
+    end
+  end
+
+  def change_move_state(action)
+    if action == GameStates::Action::PRESS && self.idle?
+      @state = GameStates::States::MOVING
+    elsif action == GameStates::Action::RELEASE && self.moving?
+      @state = GameStates::States::IDLE
+    end
+    @sprite.change_state(@state)
   end
 
   def move
@@ -39,36 +50,11 @@ class Mc < Char
 
   def draw
     @sprite.animate(@x +@sprite_offset_x, @y+@sprite_offset_y, @z)
-    if $DRAW_HB
-      Gosu.draw_line(@x, @y, $COLOR_BLUE, @x + @w, @y, $COLOR_BLUE, 2)
-      Gosu.draw_line(@x + @w, @y, $COLOR_BLUE, @x + @w, @y + @h, $COLOR_BLUE, 2)
-      Gosu.draw_line(@x + @w, @y + @h, $COLOR_BLUE, @x, @y + @h, $COLOR_BLUE, 2)
-      Gosu.draw_line(@x, @y + @h, $COLOR_BLUE, @x, @y, $COLOR_BLUE, 2)
-    end
-  end
-
-  def check_solids_collision(new_coord, axis)
-    case axis
-      when "x"
-        $CURRENT_MAP.solid_tiles.each do |tile|
-          if @y.between?(tile.y, tile.y+tile.h) || (@y+@h).between?(tile.y, tile.y+tile.h)
-            if new_coord <= tile.x + 12 && new_coord >= tile.x
-              tile.impact = true
-              return true
-            end
-          end
-        end
-        return false
-      when "y"
-        $CURRENT_MAP.solid_tiles.each do |tile|
-          if @x.between?(tile.x, tile.x+tile.w) || (@x+@w).between?(tile.x, tile.x+tile.w)
-            if new_coord <= tile.y + 12 && new_coord >= tile.y
-              tile.impact = true
-              return true
-            end
-          end
-        end
-        return false
+    if $WINDOW.draw_hb
+      Gosu.draw_line(@x, @y, $WINDOW.color_blue, @x + @w, @y, $WINDOW.color_blue, 2)
+      Gosu.draw_line(@x + @w, @y, $WINDOW.color_blue, @x + @w, @y + @h, $WINDOW.color_blue, 2)
+      Gosu.draw_line(@x + @w, @y + @h, $WINDOW.color_blue, @x, @y + @h, $WINDOW.color_blue, 2)
+      Gosu.draw_line(@x, @y + @h, $WINDOW.color_blue, @x, @y, $WINDOW.color_blue, 2)
     end
   end
 end

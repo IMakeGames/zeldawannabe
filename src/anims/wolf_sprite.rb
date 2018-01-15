@@ -1,5 +1,5 @@
-require_relative 'sprite'
-class McSprite < Sprite
+
+class WolfSprite < Sprite
   WALKING_ANIM_DURATION = 0.90
   IDLE_ANIM_DURATION = 2
 
@@ -7,6 +7,7 @@ class McSprite < Sprite
     super
     init_anim_sprites
     init_anim_durations
+    @reverse = false
   end
 
   def change_dir(dir)
@@ -37,16 +38,20 @@ class McSprite < Sprite
   end
 
   def animate(x, y, z)
-    if @counter.between?(0,@quarter - 1)  || @counter.between?(@half,@tquarter - 1)
+    if @counter.between?(0,@half-1)
       @img = gime_right_anim[0]
-    elsif @counter.between?(@quarter,@half-1)
-      @img = gime_right_anim[1]
     else
-      @img = gime_right_anim[2]
+      @img = gime_right_anim[1]
     end
 
-    @counter >= @total ? @counter = 0 :
+    if @counter >= @total
+      @counter = 0
+      #@face_dir = GameStates::FaceDir.oposite_of(@face_dir)
+    end
+
     @counter += 1
+
+    x_scale = @face_dir == GameStates::FaceDir::LEFT ? 1 : -1
     @img.draw(x,y,z)
   end
 
@@ -60,43 +65,27 @@ class McSprite < Sprite
 
 
   def init_anim_sprites
-    @imgs = Gosu::Image.load_tiles("../../assets/sprites/MainChar/normal_walking_anim.png", 18, 20, retro: true)
-    @down_walking_anim  =  [@imgs[0],@imgs[1],@imgs[2]]
-    @down_idle_anim     =  [@imgs[0],@imgs[3],@imgs[4]]
-    @right_walking_anim =  [@imgs[5],@imgs[6],@imgs[7]]
-    @right_idle_anim    =  [@imgs[5],@imgs[8],@imgs[9]]
-    @up_walking_anim    =  [@imgs[10],@imgs[11],@imgs[12]]
-    @up_idle_anim       =  [@imgs[11],@imgs[13],@imgs[14]]
-    @left_walking_anim  =  [@imgs[15],@imgs[16],@imgs[17]]
-    @left_idle_anim     =  [@imgs[15],@imgs[18],@imgs[19]]
-    @current_anim = @down_walking_anim
+    @imgs = Gosu::Image.load_tiles("../../assets/sprites/Enemies/wolf.png", 18, 16, retro: true)
+    @idle_anim        =  [@imgs[0],@imgs[1]]
+    @walking_anim     =  [@imgs[4],@imgs[5]]
+    @current_anim = @idle_anim
   end
 
   def gime_right_anim
     case @face_dir
       when GameStates::FaceDir::UP
-        if moving?
-          return @up_walking_anim
-        else
-          return @up_idle_anim
-        end
       when GameStates::FaceDir::DOWN
-        if moving?
-          return @down_walking_anim
-        else
-          return @down_idle_anim
-        end
       when GameStates::FaceDir::LEFT
         if moving?
-          return @left_walking_anim
+          return @walking_anim
         else
-          return @left_idle_anim
+          return @idle_anim
         end
       when GameStates::FaceDir::RIGHT
         if moving?
-          return @right_walking_anim
+          return @walking_anim
         else
-          return @right_idle_anim
+          return @idle_anim
         end
     end
   end
