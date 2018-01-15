@@ -2,6 +2,8 @@ require '../../src/obj/map/map_tile'
 class MainMap
   TILE_WIDTH = 12
   TILE_HEIGHT = 12
+  TOTAL_HEIGHT = 800
+  TOTAL_WIDTH = 800
   attr_accessor :solid_tiles
 
   def initialize
@@ -53,10 +55,15 @@ class MainMap
     @underbrush1 = @map_sprites[43]
     @underbrush2 = @map_sprites[44]
 
-    @tree1 = @map_sprites[48]
-    @tree2 = @map_sprites[49]
-    @tree3 = @map_sprites[56]
-    @tree4 = @map_sprites[57]
+    @hedge_tree1_1 = @map_sprites[48]
+    @hedge_tree1_2 = @map_sprites[49]
+    @hedge_tree1_3 = @map_sprites[56]
+    @hedge_tree1_4 = @map_sprites[57]
+
+    @hedge_tree2_1 = @map_sprites[54]
+    @hedge_tree2_2 = @map_sprites[55]
+    @hedge_tree2_3 = @map_sprites[62]
+    @hedge_tree2_4 = @map_sprites[63]
 
 
     @map_tiles = []
@@ -180,13 +187,22 @@ class MainMap
           when 'J'
             sprite_to_set = @underbrush2
           when 'K'
-            sprite_to_set = @tree1
+            sprite_to_set = @hedge_tree1_1
           when 'L'
-            sprite_to_set = @tree2
+            sprite_to_set = @hedge_tree1_2
           when 'M'
-            sprite_to_set = @tree3
+            sprite_to_set = @hedge_tree1_3
           when 'N'
-            sprite_to_set = @tree4
+            sprite_to_set = @hedge_tree1_4
+          when 'O'
+            sprite_to_set = @hedge_tree2_1
+          when 'P'
+            sprite_to_set = @hedge_tree2_2
+          when 'Q'
+            sprite_to_set = @hedge_tree2_3
+          when 'R'
+            sprite_to_set = @hedge_tree2_4
+
         end
         if !sprite_to_set.nil?
           new_tile = MapTile.new(sprite_to_set, x*TILE_WIDTH, y*TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT, solid)
