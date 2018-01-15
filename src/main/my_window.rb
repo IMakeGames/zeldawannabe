@@ -6,7 +6,7 @@ require '../../src/obj/map/main_map'
 class MyWindow < Gosu::Window
 
   def initialize
-    super 640, 480, update_interval: 1000/$FPS
+    super 800, 600, update_interval: 1000/$FPS
     self.caption = 'Hello World!'
     @bg_map = MainMap.new
     @player = Mc.new
