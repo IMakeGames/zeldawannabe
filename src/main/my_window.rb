@@ -11,7 +11,7 @@ class MyWindow < Gosu::Window
 
   def initialize
     @fps = 60
-    @draw_hb = true
+    @draw_hb = false
     @color_red = Gosu::Color.argb(0xff_ff0000)
     @color_blue = Gosu::Color.argb(0xff_0000ff)
     @color_yellow = Gosu::Color.argb(0xff_ffff00)
@@ -20,6 +20,7 @@ class MyWindow < Gosu::Window
     @half_screen_width = ((WINDOW_WIDTH/3)/2).ceil
     @map_offsetx = 0
     @map_offsety = 0
+    @initiating = true
     self.caption = 'Hello World!'
   end
 
@@ -64,10 +65,15 @@ class MyWindow < Gosu::Window
   def draw
     Gosu.translate(@map_offsetx, @map_offsety) {
       Gosu.scale(3, 3) {
-        @current_map.draw
-        @player.draw
-        @wolf.draw
-        #Gosu::Font.new(10).draw(Gosu.fps,2,2,2,1,1,$COLOR_BLUE)
+        if @initiating
+          @current_map.draw_bg
+          @initiating = false
+        else
+          @current_map.draw
+          @player.draw
+          @wolf.draw
+          #Gosu::Font.new(10).draw(Gosu.fps,2,2,2,1,1,$COLOR_BLUE)
+        end
       }
     }
   end

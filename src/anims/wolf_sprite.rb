@@ -7,7 +7,6 @@ class WolfSprite < Sprite
     super
     init_anim_sprites
     init_anim_durations
-    @reverse = false
   end
 
   def change_dir(dir)
@@ -46,13 +45,20 @@ class WolfSprite < Sprite
 
     if @counter >= @total
       @counter = 0
-      #@face_dir = GameStates::FaceDir.oposite_of(@face_dir)
+      @face_dir = GameStates::FaceDir.oposite_of(@face_dir)
     end
 
     @counter += 1
 
-    x_scale = @face_dir == GameStates::FaceDir::LEFT ? 1 : -1
-    @img.draw(x,y,z)
+    if @face_dir == GameStates::FaceDir::LEFT
+      x_scale = 1
+      reverse_offset_x = 0
+    else
+      x_scale = -1
+      reverse_offset_x = 19
+    end
+
+    @img.draw(x+reverse_offset_x,y,z,x_scale)
   end
 
   def init_anim_durations

@@ -1,8 +1,7 @@
 class MapTile
-  attr_accessor :x,:y,:w,:h,:img,:impact
+  attr_accessor :x, :y, :w, :h, :impact
 
-  def initialize(sprite, x, y, w, h, solid)
-    @img = sprite
+  def initialize(x, y, w, h, solid)
     @x = x
     @y = y
     @w = w
@@ -13,21 +12,18 @@ class MapTile
   end
 
   def draw
-    @img.draw(@x, @y, 1)
-    if @solid && $WINDOW.draw_hb
-      if @impact
-        draw_with = $WINDOW.color_yellow
-        @impact = false
-        @hb_z = 3
-      else
-        draw_with = $WINDOW.color_red
-        @hb_z = 2
-      end
-      Gosu.draw_line(@x, @y, draw_with, @x + @w, @y, draw_with, @hb_z)
-      Gosu.draw_line(@x + @w, @y, draw_with, @x + @w, @y + @h, draw_with, @hb_z)
-      Gosu.draw_line(@x + @w, @y + @h, draw_with, @x, @y + @h, draw_with, @hb_z)
-      Gosu.draw_line(@x, @y + @h, draw_with, @x, @y, draw_with, @hb_z)
+    if @impact
+      draw_with = $WINDOW.color_yellow
+      @impact = false
+      @hb_z = 3
+    else
+      draw_with = $WINDOW.color_red
+      @hb_z = 2
     end
+    Gosu.draw_line(@x, @y, draw_with, @x + @w, @y, draw_with, @hb_z)
+    Gosu.draw_line(@x + @w, @y, draw_with, @x + @w, @y + @h, draw_with, @hb_z)
+    Gosu.draw_line(@x + @w, @y + @h, draw_with, @x, @y + @h, draw_with, @hb_z)
+    Gosu.draw_line(@x, @y + @h, draw_with, @x, @y, draw_with, @hb_z)
   end
 
   def solid?
