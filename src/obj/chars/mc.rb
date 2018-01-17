@@ -3,22 +3,23 @@ require '../../src/obj/chars/char'
 require '../anims/mc_sprite'
 class Mc < Char
   CHAR_ACC = 0.2
-  CHAR_SPEED = 2
 
   def initialize
-    super
-    @x = @y = 0
-    @z = 1
-    @w = 8
-    @h = 10
+    super(0,0,8,10)
     @sprite = McSprite.new
-    @sprite_offset_x = -6
-    @sprite_offset_y = -9
+    @char_speed = 2
+    @sah = []
+    change_dir(GameStates::FaceDir::DOWN)
+    #@sword_init_angle = @sia
+    @sia = 0
   end
 
   def update
     if moving?
       move
+    end
+    if attacking?
+      perform_attack
     end
   end
 
@@ -31,30 +32,61 @@ class Mc < Char
     @sprite.change_state(@state)
   end
 
-  def move
+  def attack
+    @state = GameStates::States::ATTACKING
+
+    @action_tiks =18
+    @fourf  = ((@action_tiks/5) * 4).ceil
+    @threef = ((@action_tiks/5) * 3).ceil
+    @twof   = ((@action_tiks/5) * 2).ceil
+    @onef   = (@action_tiks/5).ceil
+    @sprite.change_state(@state)
+    #@sword_attack_hitboxes = @sah
+    @sah = [HitBox.new(0,0,2,3), HitBox.new(0,0,2,3), HitBox.new(0,0,2,3)]
+
     case @face_dir
       when GameStates::FaceDir::UP
-        new_y = @y - CHAR_SPEED
-        check_solids_collision(new_y, "y") ? return : @y = new_y
+        @sia = 292.5
       when GameStates::FaceDir::RIGHT
-        new_x = @x + CHAR_SPEED
-        check_solids_collision(new_x+@w, "x") ? return : @x = new_x
+        @sia = 67.5
       when GameStates::FaceDir::DOWN
-        new_y = @y + CHAR_SPEED
-        check_solids_collision(new_y + @h, "y") ? return : @y = new_y
+        @sia = 112.5
       when GameStates::FaceDir::LEFT
-        new_x = @x - CHAR_SPEED
-        check_solids_collision(new_x, "x") ? return : @x = new_x
+        @sia = 202.5
     end
+    rotate_sword(@sia)
+  end
+
+  def perform_attack
+    if @action_tiks == @fourf ||  @action_tiks == @threef || @action_tiks == @twof || @action_tiks == @onef
+      @sia += 22.5
+      rotate_sword(@sia)
+    elsif @action_tiks == 0
+      @sah = []
+      @state = GameStates::States::IDLE
+      @sprite.change_state(@state)
+      $WINDOW.kb_locked = false
+    end
+    @action_tiks -= 1
   end
 
   def draw
-    @sprite.animate(@x +@sprite_offset_x, @y+@sprite_offset_y, @z)
-    if $WINDOW.draw_hb
-      Gosu.draw_line(@x, @y, $WINDOW.color_blue, @x + @w, @y, $WINDOW.color_blue, 2)
-      Gosu.draw_line(@x + @w, @y, $WINDOW.color_blue, @x + @w, @y + @h, $WINDOW.color_blue, 2)
-      Gosu.draw_line(@x + @w, @y + @h, $WINDOW.color_blue, @x, @y + @h, $WINDOW.color_blue, 2)
-      Gosu.draw_line(@x, @y + @h, $WINDOW.color_blue, @x, @y, $WINDOW.color_blue, 2)
+    super
+    @sah.each do |hb|
+      hb.draw
     end
+  end
+
+  def midpoint
+    midpoint_x = (@hb.x + (@hb.w/2)).ceil
+    midpoint_y = (@hb.y + (@hb.h/2)).ceil
+
+    return [midpoint_x,midpoint_y]
+  end
+
+  def rotate_sword(angle)
+    @sah[0].place(midpoint[0]+Gosu.offset_x(angle,8), midpoint[1]+Gosu.offset_y(angle,8))
+    @sah[1].place(midpoint[0]+Gosu.offset_x(angle,11), midpoint[1]+Gosu.offset_y(angle,11))
+    @sah[2].place(midpoint[0]+Gosu.offset_x(angle,14), midpoint[1]+Gosu.offset_y(angle,14))
   end
 end

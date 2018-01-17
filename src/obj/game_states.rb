@@ -5,6 +5,8 @@ module GameStates
     IDLE = 2
     ATTACKING = 3
     RECOILING = 4
+    SEATHING = 5
+    ROLLING = 6
   end
 
   class FaceDir
@@ -31,4 +33,5 @@ module GameStates
     PRESS = 1
     RELEASE = 1
   end
+
 end

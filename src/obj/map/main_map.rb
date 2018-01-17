@@ -4,21 +4,21 @@ class MainMap
   TILE_HEIGHT = 12
   TOTAL_HEIGHT = 800
   TOTAL_WIDTH = 800
-  attr_accessor :solid_tiles
+  attr_accessor :solid_hbs
 
   def initialize
-    @solid_tiles = []
+    @solid_hbs = []
   end
 
   def draw
     @bg.draw(0, 0, 0)
     if $WINDOW.draw_hb
-      @solid_tiles.each do |tile|
-        tile.draw
+      @solid_hbs.each do |hitbox|
+        hitbox.draw
       end
     end
   end
-  
+
   def draw_bg
     map_sprites = Gosu::Image.load_tiles("../../assets/sprites/Mapas/forest_floor_tiles.png", TILE_WIDTH, TILE_HEIGHT, retro: true)
     plain_d = map_sprites[0]
@@ -216,7 +216,7 @@ class MainMap
           if !sprite_to_set.nil?
             sprite_to_set.draw(x*TILE_WIDTH, y*TILE_HEIGHT, 1)
             if solid
-              @solid_tiles << MapTile.new(x*TILE_WIDTH, y*TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT, solid)
+              @solid_hbs << HitBox.new(x*TILE_WIDTH, y*TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT)
             end
           end
         end
