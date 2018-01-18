@@ -44,4 +44,11 @@ class HitBox
     end
     return false
   end
+
+  def midpoint
+    midpoint_x = (@x + (@w/2)).ceil
+    midpoint_y = (@y + (@h/2)).ceil
+
+    return [midpoint_x, midpoint_y]
+  end
 end

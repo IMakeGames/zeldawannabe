@@ -2,13 +2,14 @@ require 'gosu'
 require '../../src/obj/chars/mc'
 require '../../src/obj/chars/wolf'
 require '../../src/obj/game_states'
+require '../../src/obj/interface'
 require '../../src/obj/map/main_map'
 
 class MyWindow < Gosu::Window
   attr_reader :fps, :draw_hb, :color_red, :color_blue, :color_yellow, :w_height, :w_width, :player, :current_map,
               :kb_locked, :command_stack
   attr_writer :kb_locked
-  WINDOW_HEIGHT = 600
+  WINDOW_HEIGHT = 720
   WINDOW_WIDTH = 800
 
   def initialize
@@ -28,6 +29,9 @@ class MyWindow < Gosu::Window
   end
 
   def button_down(id)
+    if id == Gosu::KB_H
+      @draw_hb = @draw_hb ? false : true
+    end
     case id
       when Gosu::KB_LEFT
         @command_stack << {:MOVE => GameStates::FaceDir::LEFT}
@@ -49,11 +53,11 @@ class MyWindow < Gosu::Window
       when Gosu::KB_RIGHT
         dir = GameStates::FaceDir::RIGHT
       when Gosu::KB_UP
-        dir =  GameStates::FaceDir::UP
+        dir = GameStates::FaceDir::UP
       when Gosu::KB_DOWN
         dir = GameStates::FaceDir::DOWN
     end
-    @command_stack.delete_if{ |hash|
+    @command_stack.delete_if {|hash|
       hash.values.last == dir
     }
   end
@@ -67,16 +71,17 @@ class MyWindow < Gosu::Window
 
     #WINDOW SCROLLING
     if @player.hb.y > @half_screen_height
-      @map_offsety = (@half_screen_height - @player.hb.y)*3
+      @map_offsety = (@half_screen_height - @player.hb.y)
     end
     if @player.hb.x > @half_screen_width
-      @map_offsetx = (@half_screen_width - @player.hb.x)*3
+      @map_offsetx = (@half_screen_width - @player.hb.x)
     end
   end
 
   def draw
-    Gosu.translate(@map_offsetx, @map_offsety) {
-      Gosu.scale(3, 3) {
+    Gosu.scale(3, 3) {
+      @interface.draw
+      Gosu.translate(@map_offsetx-1, @map_offsety+59) {
         if @initializing_map
           @current_map.draw_bg
           @initializing_map = false
@@ -91,6 +96,7 @@ class MyWindow < Gosu::Window
 
   def init_objects
     @current_map = MainMap.new
-    @player = Mc.new(100,100)
+    @interface = Interface.new
+    @player = Mc.new(100, 100)
   end
 end

@@ -34,6 +34,9 @@ class McSprite < Sprite
         when GameStates::States::ATTACKING
           @loop = false
           @total = ATTACKING_ANIM_DURATION*$WINDOW.fps
+        when GameStates::States::RECOILING
+          @loop = true
+          @total = 8
       end
 
       @animation = gime_right_anim
@@ -48,7 +51,7 @@ class McSprite < Sprite
     end
   end
 
-  def animate(x, y, z)
+  def animate_linear(x, y, z)
     if @counter.between?(@frame_duration*(@frame_num - 1), @frame_duration*@frame_num)
       @img = @animation[@frame_num -1]
     else
@@ -105,7 +108,7 @@ class McSprite < Sprite
     @left_block = @imgs[37]
     @up_block = @imgs[38]
 
-    @damaged = [@imgs[39], @imgs[40]]
+    @damaged = [@imgs[39], @imgs[49]]
 
     @down_rolling = [@imgs[5], @imgs[6], @imgs[7], @imgs[8], @imgs[9]]
     @side_rolling = [@imgs[15], @imgs[16], @imgs[17], @imgs[18], @imgs[19]]
@@ -120,47 +123,51 @@ class McSprite < Sprite
 
   def gime_right_anim
     offset18x20
-    case @face_dir
-      when GameStates::FaceDir::UP
-        if moving?
-          return @up_walking_anim
-        elsif attacking?
-          @offset_x = -10
-          @offset_y = -14
-          return @up_sword_attacking
-        else
-          return @up_idle_anim
-        end
-      when GameStates::FaceDir::DOWN
-        if moving?
-          return @down_walking_anim
-        elsif attacking?
-          @offset_x = -10
-          @offset_y = -8
-          return @down_sword_attacking
-        else
-          return @down_idle_anim
-        end
-      when GameStates::FaceDir::LEFT
-        if moving?
-          return @left_walking_anim
-        elsif attacking?
-          @offset_x = -13
-          @offset_y = -8
-          return @left_sword_attacking
-        else
-          return @left_idle_anim
-        end
-      when GameStates::FaceDir::RIGHT
-        if moving?
-          return @right_walking_anim
-        elsif attacking?
-          @offset_x = -10
-          @offset_y = -8
-          return @right_sword_attacking
-        else
-          return @right_idle_anim
-        end
+    if recoiling?
+      return @damaged
+    else
+      case @face_dir
+        when GameStates::FaceDir::UP
+          if moving?
+            return @up_walking_anim
+          elsif attacking?
+            @offset_x = -10
+            @offset_y = -14
+            return @up_sword_attacking
+          else
+            return @up_idle_anim
+          end
+        when GameStates::FaceDir::DOWN
+          if moving?
+            return @down_walking_anim
+          elsif attacking?
+            @offset_x = -10
+            @offset_y = -8
+            return @down_sword_attacking
+          else
+            return @down_idle_anim
+          end
+        when GameStates::FaceDir::LEFT
+          if moving?
+            return @left_walking_anim
+          elsif attacking?
+            @offset_x = -13
+            @offset_y = -8
+            return @left_sword_attacking
+          else
+            return @left_idle_anim
+          end
+        when GameStates::FaceDir::RIGHT
+          if moving?
+            return @right_walking_anim
+          elsif attacking?
+            @offset_x = -10
+            @offset_y = -8
+            return @right_sword_attacking
+          else
+            return @right_idle_anim
+          end
+      end
     end
   end
 

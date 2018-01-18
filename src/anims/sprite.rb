@@ -15,5 +15,9 @@ class Sprite
   def recoiling?
     return @state ==  GameStates::States::RECOILING
   end
+
+  def dying?
+    return @state == GameStates::States::DYING
+  end
   
 end

@@ -7,6 +7,8 @@ module GameStates
     RECOILING = 4
     SEATHING = 5
     ROLLING = 6
+    DYING = 7
+    CUSTOM = 8
   end
 
   class FaceDir
@@ -28,10 +30,4 @@ module GameStates
       end
     end
   end
-
-  class Action
-    PRESS = 1
-    RELEASE = 1
-  end
-
 end

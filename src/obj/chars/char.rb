@@ -28,6 +28,9 @@ class Char
     return @state == GameStates::States::RECOILING
   end
 
+  def dying?
+    return @state == GameStates::States::DYING
+  end
 
   def place(x, y)
     @hb.place(x, y)
@@ -77,7 +80,7 @@ class Char
     if $WINDOW.draw_hb
       @hb.draw
     end
-    @sprite.animate(@hb.x, @hb.y, 1)
+    @sprite.animate_linear(@hb.x, @hb.y, 1)
   end
 
   def move

@@ -2,6 +2,7 @@ require 'gosu'
 require '../../src/obj/chars/char'
 require '../anims/mc_sprite'
 class Mc < Char
+  attr_reader :invis_frames
   CHAR_ACC = 0.2
 
   def initialize(x, y)
@@ -14,6 +15,7 @@ class Mc < Char
     change_state(GameStates::States::IDLE)
     #@sword_initial_angle = @sia
     @sia = 0
+    @invis_frames = 0
   end
 
   def update
@@ -27,7 +29,6 @@ class Mc < Char
         $WINDOW.kb_locked = true
         attack
       end
-
       if moving?
         move
       end
@@ -38,6 +39,20 @@ class Mc < Char
       if recoiling?
         recoil
       end
+    end
+    @invis_frames = @invis_frames > 0 ? @invis_frames - 1 : 0
+  end
+
+  def impacted(away_from)
+    super(away_from)
+    $WINDOW.kb_locked = true
+    @invis_frames = 40
+  end
+
+  def recoil
+    super
+    if @event_tiks <= 0
+      $WINDOW.kb_locked = false
     end
   end
 
@@ -67,7 +82,7 @@ class Mc < Char
     @sah.each do |hb|
       $WINDOW.current_map.enemies.each do |enemy|
         if !enemy.recoiling? && hb.check_brute_collision(enemy.hb)
-          enemy.impacted(midpoint)
+          enemy.impacted(@hb.midpoint)
         end
       end
     end
@@ -93,16 +108,9 @@ class Mc < Char
 
   end
 
-  def midpoint
-    midpoint_x = (@hb.x + (@hb.w/2)).ceil
-    midpoint_y = (@hb.y + (@hb.h/2)).ceil
-
-    return [midpoint_x, midpoint_y]
-  end
-
   def rotate_sword(angle)
-    @sah[0].place(midpoint[0]+Gosu.offset_x(angle, 10), midpoint[1]+Gosu.offset_y(angle, 10))
+    @sah[0].place(@hb.midpoint[0]+Gosu.offset_x(angle, 10), @hb.midpoint[1]+Gosu.offset_y(angle, 10))
 
-    @sah[1].place(midpoint[0]+Gosu.offset_x(angle, 14), midpoint[1]+Gosu.offset_y(angle, 16))
+    @sah[1].place(@hb.midpoint[0]+Gosu.offset_x(angle, 14), @hb.midpoint[1]+Gosu.offset_y(angle, 16))
   end
 end
