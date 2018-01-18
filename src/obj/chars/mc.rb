@@ -5,44 +5,49 @@ class Mc < Char
   CHAR_ACC = 0.2
 
   def initialize
-    super(0,0,8,10)
+    super(0, 0, 8, 10)
     @sprite = McSprite.new
     @char_speed = 2
     @sah = []
     change_dir(GameStates::FaceDir::DOWN)
+    change_state(GameStates::States::IDLE)
     #@sword_init_angle = @sia
     @sia = 0
   end
 
   def update
-    if moving?
-      move
-    end
-    if attacking?
-      perform_attack
-    end
-  end
+    if !$WINDOW.kb_locked
+      if $WINDOW.command_stack.empty?
+        change_state(GameStates::States::IDLE)
+      elsif $WINDOW.command_stack.last.keys.first == :MOVE
+        change_dir($WINDOW.command_stack.last[:MOVE])
+        change_state(GameStates::States::MOVING)
+      elsif $WINDOW.command_stack.last.keys.first == :ATTACK
+        $WINDOW.kb_locked = true
+        attack
+      end
 
-  def change_move_state(action)
-    if action == GameStates::Action::PRESS && self.idle?
-      @state = GameStates::States::MOVING
-    elsif action == GameStates::Action::RELEASE && self.moving?
-      @state = GameStates::States::IDLE
+      if moving?
+        move
+      end
+    else
+      if attacking?
+        perform_attack
+      end
     end
-    @sprite.change_state(@state)
   end
 
   def attack
     @state = GameStates::States::ATTACKING
 
-    @action_tiks =18
-    @fourf  = ((@action_tiks/5) * 4).ceil
+    @action_tiks =0.3*$WINDOW.fps
+    @fourf = ((@action_tiks/5) * 4).ceil
     @threef = ((@action_tiks/5) * 3).ceil
-    @twof   = ((@action_tiks/5) * 2).ceil
-    @onef   = (@action_tiks/5).ceil
+    @twof = ((@action_tiks/5) * 2).ceil
+    @onef = (@action_tiks/5).ceil
     @sprite.change_state(@state)
     #@sword_attack_hitboxes = @sah
-    @sah = [HitBox.new(0,0,2,3), HitBox.new(0,0,2,3), HitBox.new(0,0,2,3)]
+    @sah = [HitBox.new(0, 0, 2, 3), HitBox.new(0, 0, 2, 3), HitBox.new(0, 0, 2, 3)]
 
     case @face_dir
       when GameStates::FaceDir::UP
@@ -58,7 +63,7 @@ class Mc < Char
   end
 
   def perform_attack
-    if @action_tiks == @fourf ||  @action_tiks == @threef || @action_tiks == @twof || @action_tiks == @onef
+    if @action_tiks == @fourf || @action_tiks == @threef || @action_tiks == @twof || @action_tiks == @onef
       @sia += 22.5
       rotate_sword(@sia)
     elsif @action_tiks == 0
@@ -72,21 +77,24 @@ class Mc < Char
 
   def draw
     super
-    @sah.each do |hb|
-      hb.draw
+    if $WINDOW.draw_hb
+      @sah.each do |hb|
+        hb.draw
+      end
     end
+
   end
 
   def midpoint
     midpoint_x = (@hb.x + (@hb.w/2)).ceil
     midpoint_y = (@hb.y + (@hb.h/2)).ceil
 
-    return [midpoint_x,midpoint_y]
+    return [midpoint_x, midpoint_y]
   end
 
   def rotate_sword(angle)
-    @sah[0].place(midpoint[0]+Gosu.offset_x(angle,8), midpoint[1]+Gosu.offset_y(angle,8))
-    @sah[1].place(midpoint[0]+Gosu.offset_x(angle,11), midpoint[1]+Gosu.offset_y(angle,11))
-    @sah[2].place(midpoint[0]+Gosu.offset_x(angle,14), midpoint[1]+Gosu.offset_y(angle,14))
+    @sah[0].place(midpoint[0]+Gosu.offset_x(angle, 10), midpoint[1]+Gosu.offset_y(angle, 10))
+    @sah[1].place(midpoint[0]+Gosu.offset_x(angle, 12), midpoint[1]+Gosu.offset_y(angle, 13))
+    @sah[2].place(midpoint[0]+Gosu.offset_x(angle, 14), midpoint[1]+Gosu.offset_y(angle, 16))
   end
 end

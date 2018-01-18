@@ -4,37 +4,41 @@ require_relative 'hit_box'
 class Char
   attr_accessor :state, :face_dir, :sprite_offset_x, :sprite_offset_y, :action_tiks, :hb, :char_speed
 
-  def initialize(x,y,w,h)
-    @state =  GameStates::States::IDLE
+  def initialize(x, y, w, h)
     @sprite = nil
     @action_tiks = 0
-    @hb = HitBox.new(x,y,w,h)
+    @hb = HitBox.new(x, y, w, h)
   end
 
   def idle?
-    return @state ==  GameStates::States::IDLE
+    return @state == GameStates::States::IDLE
   end
 
   def moving?
-    return @state ==  GameStates::States::MOVING
+    return @state == GameStates::States::MOVING
   end
 
   def attacking?
-    return @state ==  GameStates::States::ATTACKING
+    return @state == GameStates::States::ATTACKING
   end
 
   def recoiling?
-    return @state ==  GameStates::States::RECOILING
+    return @state == GameStates::States::RECOILING
   end
 
 
   def place(x, y)
-    @hb.place(x,y)
+    @hb.place(x, y)
   end
 
   def change_dir(dir)
     @face_dir = dir
     @sprite.change_dir(dir)
+  end
+
+  def change_state(id)
+    @state = id
+    @sprite.change_state(id)
   end
 
   def update
@@ -55,7 +59,7 @@ class Char
         x2 = @hb.x + @hb.w
         y1 = @hb.y - char_speed
         $WINDOW.current_map.solid_hbs.each do |hbs|
-          if hbs.check_point_collision(x1,y1) || hbs.check_point_collision(x2,y1)
+          if hbs.check_point_collision(x1, y1) || hbs.check_point_collision(x2, y1)
             return
           end
         end
@@ -65,7 +69,7 @@ class Char
         y1 = @hb.y
         y2 = @hb.y + @hb.h
         $WINDOW.current_map.solid_hbs.each do |hbs|
-          if hbs.check_point_collision(x1,y1) || hbs.check_point_collision(x1,y2)
+          if hbs.check_point_collision(x1, y1) || hbs.check_point_collision(x1, y2)
             return
           end
         end
@@ -75,7 +79,7 @@ class Char
         x2 = @hb.x + @hb.w
         y1 = @hb.y + @hb.h + char_speed
         $WINDOW.current_map.solid_hbs.each do |hbs|
-          if hbs.check_point_collision(x1,y1) || hbs.check_point_collision(x2,y1)
+          if hbs.check_point_collision(x1, y1) || hbs.check_point_collision(x2, y1)
             return
           end
         end
@@ -85,7 +89,7 @@ class Char
         y1 = @hb.y
         y2 = @hb.y + @hb.h
         $WINDOW.current_map.solid_hbs.each do |hbs|
-          if hbs.check_point_collision(x1,y1) || hbs.check_point_collision(x1,y2)
+          if hbs.check_point_collision(x1, y1) || hbs.check_point_collision(x1, y2)
             return
           end
         end

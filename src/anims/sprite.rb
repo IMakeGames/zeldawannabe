@@ -1,10 +1,5 @@
 class Sprite
 
-  def initialize
-    @state =  GameStates::States::IDLE
-    @face_dir = GameStates::FaceDir::LEFT
-  end
-
   def idle?
     return @state ==  GameStates::States::IDLE
   end

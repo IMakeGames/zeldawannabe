@@ -6,14 +6,14 @@ require '../../src/obj/map/main_map'
 
 class MyWindow < Gosu::Window
   attr_reader :fps, :draw_hb, :color_red, :color_blue, :color_yellow, :w_height, :w_width, :player, :current_map,
-              :kb_locked
+              :kb_locked, :command_stack
   attr_writer :kb_locked
   WINDOW_HEIGHT = 600
   WINDOW_WIDTH = 800
 
   def initialize
-    @fps = 60
-    @draw_hb = true
+    @fps = 50
+    @draw_hb = false
     @color_red = Gosu::Color.argb(0xff_ff0000)
     @color_blue = Gosu::Color.argb(0xff_0000ff)
     @color_yellow = Gosu::Color.argb(0xff_ffff00)
@@ -22,37 +22,46 @@ class MyWindow < Gosu::Window
     @half_screen_width = ((WINDOW_WIDTH/3)/2).ceil
     @map_offsetx = 0
     @map_offsety = 0
-
+    @redraw = true
+    @command_stack = []
     @initiating = true
     @kb_locked = false
     self.caption = 'Hello World!'
   end
 
   def button_down(id)
-    if !@kb_locked
-      if [Gosu::KB_LEFT, Gosu::KB_RIGHT, Gosu::KB_UP, Gosu::KB_DOWN].include? id
-        @player.change_move_state(GameStates::Action::PRESS)
-        case id
-          when Gosu::KB_LEFT
-            @player.change_dir(GameStates::FaceDir::LEFT)
-          when Gosu::KB_RIGHT
-            @player.change_dir(GameStates::FaceDir::RIGHT)
-          when Gosu::KB_UP
-            @player.change_dir(GameStates::FaceDir::UP)
-          when Gosu::KB_DOWN
-            @player.change_dir(GameStates::FaceDir::DOWN)
-        end
-      elsif id == Gosu::KB_A
-        @player.attack
-        @kb_locked = true
-      end
+    case id
+      when Gosu::KB_LEFT
+        @command_stack << {:MOVE => GameStates::FaceDir::LEFT}
+      when Gosu::KB_RIGHT
+        @command_stack << {:MOVE => GameStates::FaceDir::RIGHT}
+      when Gosu::KB_UP
+        @command_stack << {:MOVE => GameStates::FaceDir::UP}
+      when Gosu::KB_DOWN
+        @command_stack << {:MOVE => GameStates::FaceDir::DOWN}
+      when Gosu::KB_A
+        @kb_locked ? nil : @command_stack << {:ATTACK => Gosu::KB_A}
     end
   end
 
   def button_up(id)
-    if [Gosu::KB_LEFT, Gosu::KB_RIGHT, Gosu::KB_UP, Gosu::KB_DOWN].include? id
-      @player.change_move_state(GameStates::Action::RELEASE)
+    case id
+      when Gosu::KB_LEFT
+        dir = GameStates::FaceDir::LEFT
+      when Gosu::KB_RIGHT
+        dir = GameStates::FaceDir::RIGHT
+      when Gosu::KB_UP
+        dir =  GameStates::FaceDir::UP
+      when Gosu::KB_DOWN
+        dir = GameStates::FaceDir::DOWN
+      when Gosu::KB_A
+        @command_stack.delete_if{ |hash|
+          hash.keys.last == :ATTACK
+        }
     end
+    @command_stack.delete_if{ |hash|
+      hash.values.last == dir
+    }
   end
 
   def update
@@ -80,7 +89,7 @@ class MyWindow < Gosu::Window
         else
           @current_map.draw
           @player.draw
-          @wolf.draw
+          #@wolf.draw
           #Gosu::Font.new(10).draw(Gosu.fps,2,2,2,1,1,$COLOR_BLUE)
         end
       }
@@ -89,10 +98,9 @@ class MyWindow < Gosu::Window
 
   def init_objects
     @current_map = MainMap.new
-    puts @current_map.solid_hbs.count
-    @wolf = Wolf.new
+    #@wolf = Wolf.new
     @player = Mc.new
     @player.place(100, 100)
-    @wolf.place(120, 120)
+    #@wolf.place(120, 120)
   end
 end

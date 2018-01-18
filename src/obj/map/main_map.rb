@@ -11,7 +11,7 @@ class MainMap
   end
 
   def draw
-    @bg.draw(0, 0, 0)
+    @bg.draw(1, 1, 1)
     if $WINDOW.draw_hb
       @solid_hbs.each do |hitbox|
         hitbox.draw
