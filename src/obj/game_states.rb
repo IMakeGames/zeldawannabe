@@ -15,7 +15,7 @@ module GameStates
     DOWN = 3
     LEFT = 4
 
-    def self.oposite_of(dir)
+    def self.opposite_of(dir)
       case dir
         when UP
           return DOWN

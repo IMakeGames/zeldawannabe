@@ -41,9 +41,10 @@ class McSprite < Sprite
       @total = (@frame_duration*@animation.count) < @total ? @frame_duration*@animation.count : @total
       @frame_num = 1
       @counter = 0
-      if state == GameStates::States::ATTACKING
-        puts "anim count = "+@animation.count.to_s+" total duration = "+@total.to_s+" frame duration = "+ @frame_duration.to_s
-      end
+      #TODO: THIS CODE CAN HELP ANALIZING THE ANIMATIONS' TIME DURATION
+      # if state == GameStates::States::ATTACKING
+      #   puts "anim count = "+@animation.count.to_s+" total duration = "+@total.to_s+" frame duration = "+ @frame_duration.to_s
+      # end
     end
   end
 
@@ -59,6 +60,7 @@ class McSprite < Sprite
         @counter = 0
         @frame_num = 1
       else
+        #TODO: THIS CODE HERE MUST BE ANALIZED FOR WHETHER IT IS REALLY USEFUL OR NOT
         # change_state(GameStates::States::IDLE)
         # @img = @animation[@frame_num -1]
       end

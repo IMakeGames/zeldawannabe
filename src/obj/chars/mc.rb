@@ -4,14 +4,15 @@ require '../anims/mc_sprite'
 class Mc < Char
   CHAR_ACC = 0.2
 
-  def initialize
-    super(0, 0, 8, 10)
+  def initialize(x, y)
+    super(x, y, 8, 10)
     @sprite = McSprite.new
     @char_speed = 2
     @sah = []
+    @hp = 10
     change_dir(GameStates::FaceDir::DOWN)
     change_state(GameStates::States::IDLE)
-    #@sword_init_angle = @sia
+    #@sword_initial_angle = @sia
     @sia = 0
   end
 
@@ -34,26 +35,24 @@ class Mc < Char
       if attacking?
         perform_attack
       end
+      if recoiling?
+        recoil
+      end
     end
   end
 
   def attack
-    @state = GameStates::States::ATTACKING
+    change_state(GameStates::States::ATTACKING)
+    @event_tiks =0.3*$WINDOW.fps
 
-    @action_tiks =0.3*$WINDOW.fps
-    @fourf = ((@action_tiks/5) * 4).ceil
-    @threef = ((@action_tiks/5) * 3).ceil
-    @twof = ((@action_tiks/5) * 2).ceil
-    @onef = (@action_tiks/5).ceil
-    @sprite.change_state(@state)
     #@sword_attack_hitboxes = @sah
-    @sah = [HitBox.new(0, 0, 2, 3), HitBox.new(0, 0, 2, 3), HitBox.new(0, 0, 2, 3)]
+    @sah = [HitBox.new(0, 0, 2, 3), HitBox.new(0, 0, 2, 3)]
 
     case @face_dir
       when GameStates::FaceDir::UP
         @sia = 292.5
       when GameStates::FaceDir::RIGHT
-        @sia = 67.5
+        @sia = 22.5
       when GameStates::FaceDir::DOWN
         @sia = 112.5
       when GameStates::FaceDir::LEFT
@@ -63,16 +62,25 @@ class Mc < Char
   end
 
   def perform_attack
-    if @action_tiks == @fourf || @action_tiks == @threef || @action_tiks == @twof || @action_tiks == @onef
-      @sia += 22.5
-      rotate_sword(@sia)
-    elsif @action_tiks == 0
+    @sia += 8
+    rotate_sword(@sia)
+    @sah.each do |hb|
+      $WINDOW.current_map.enemies.each do |enemy|
+        if !enemy.recoiling? && hb.check_brute_collision(enemy.hb)
+          enemy.impacted(midpoint)
+        end
+      end
+    end
+
+    if @event_tiks == 0
       @sah = []
-      @state = GameStates::States::IDLE
-      @sprite.change_state(@state)
+      change_state(GameStates::States::IDLE)
+      $WINDOW.command_stack.delete_if {|hash|
+        hash.keys.last == :ATTACK
+      }
       $WINDOW.kb_locked = false
     end
-    @action_tiks -= 1
+    @event_tiks -= 1
   end
 
   def draw
@@ -94,7 +102,7 @@ class Mc < Char
 
   def rotate_sword(angle)
     @sah[0].place(midpoint[0]+Gosu.offset_x(angle, 10), midpoint[1]+Gosu.offset_y(angle, 10))
-    @sah[1].place(midpoint[0]+Gosu.offset_x(angle, 12), midpoint[1]+Gosu.offset_y(angle, 13))
-    @sah[2].place(midpoint[0]+Gosu.offset_x(angle, 14), midpoint[1]+Gosu.offset_y(angle, 16))
+
+    @sah[1].place(midpoint[0]+Gosu.offset_x(angle, 14), midpoint[1]+Gosu.offset_y(angle, 16))
   end
 end

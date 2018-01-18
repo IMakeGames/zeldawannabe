@@ -1,51 +1,57 @@
 
 class WolfSprite < Sprite
   WALKING_ANIM_DURATION = 0.90
-  IDLE_ANIM_DURATION = 2
+  IDLE_ANIM_DURATION = 3
 
   def initialize
-    super
     init_anim_sprites
-    init_anim_durations
+    change_dir(GameStates::FaceDir::LEFT)
+    change_state(GameStates::States::IDLE)
+    @counter = 0
+    @offset_x = -5
+    @offset_y = -5
+    @loop = true
   end
 
   def change_dir(dir)
-    @face_dir = dir
-    case dir
-      when GameStates::FaceDir::UP
-        @current_anim = @up_walking_anim
-      when GameStates::FaceDir::DOWN
-        @current_anim = @down_walking_anim
-      when GameStates::FaceDir::LEFT
-        @current_anim = @left_walking_anim
-      when GameStates::FaceDir::RIGHT
-        @current_anim = @right_walking_anim
+    if @face_dir != dir
+      @face_dir = dir
+      @animation = gime_right_anim
     end
   end
 
   def change_state(state)
-    @state = state
-    case state
-      when GameStates::States::MOVING
-        @total = WALKING_ANIM_DURATION*$WINDOW.fps
-      when GameStates::States::IDLE
-        @total = IDLE_ANIM_DURATION*$WINDOW.fps
+    if @state != state
+      @state = state
+      case state
+        when GameStates::States::MOVING
+          @loop = true
+          @total = WALKING_ANIM_DURATION*$WINDOW.fps
+        when GameStates::States::IDLE
+          @loop = true
+          @total = IDLE_ANIM_DURATION*$WINDOW.fps
+        when GameStates::States::ATTACKING
+          @loop = false
+          @total = ATTACKING_ANIM_DURATION*$WINDOW.fps
+      end
+
+      @animation = gime_right_anim
+      @frame_duration = (@total/@animation.count).floor
+      @total = (@frame_duration*@animation.count) < @total ? @frame_duration*@animation.count : @total
+      @frame_num = 1
+      @counter = 0
+      #TODO: THIS CODE CAN HELP ANALIZING THE ANIMATIONS' TIME DURATION
+      # if state == GameStates::States::ATTACKING
+      #   puts "anim count = "+@animation.count.to_s+" total duration = "+@total.to_s+" frame duration = "+ @frame_duration.to_s
+      # end
     end
-    @quarter = (@total/4).ceil
-    @half = (@total/2).ceil
-    @tquarter = @quarter*3
   end
 
   def animate(x, y, z)
-    if @counter.between?(0,@half-1)
-      @img = gime_right_anim[0]
+    if @counter.between?(@frame_duration*(@frame_num - 1), @frame_duration*@frame_num)
+      @img = @animation[@frame_num -1]
     else
-      @img = gime_right_anim[1]
-    end
-
-    if @counter >= @total
-      @counter = 0
-      @face_dir = GameStates::FaceDir.oposite_of(@face_dir)
+      @frame_num += 1
     end
 
     @counter += 1
@@ -55,44 +61,30 @@ class WolfSprite < Sprite
       reverse_offset_x = 0
     else
       x_scale = -1
-      reverse_offset_x = 19
+      reverse_offset_x = 15
     end
+    @img.draw(x + @offset_x + reverse_offset_x,y + @offset_y,z,x_scale)
 
-    @img.draw(x+reverse_offset_x,y,z,x_scale)
+    if @counter >= @total
+      if @loop
+        @counter = 0
+        @frame_num = 1
+        change_dir(GameStates::FaceDir.opposite_of(@face_dir))
+      end
+    end
   end
-
-  def init_anim_durations
-    @counter = 0
-    @total = IDLE_ANIM_DURATION*$WINDOW.fps
-    @quarter = (@total/4).ceil
-    @half = (@total/2).ceil
-    @tquarter = @quarter*3
-  end
-
 
   def init_anim_sprites
     @imgs = Gosu::Image.load_tiles("../../assets/sprites/Enemies/wolf.png", 18, 16, retro: true)
     @idle_anim        =  [@imgs[0],@imgs[1]]
     @walking_anim     =  [@imgs[4],@imgs[5]]
-    @current_anim = @idle_anim
   end
 
   def gime_right_anim
-    case @face_dir
-      when GameStates::FaceDir::UP
-      when GameStates::FaceDir::DOWN
-      when GameStates::FaceDir::LEFT
-        if moving?
-          return @walking_anim
-        else
-          return @idle_anim
-        end
-      when GameStates::FaceDir::RIGHT
-        if moving?
-          return @walking_anim
-        else
-          return @idle_anim
-        end
+    if moving?
+      return @walking_anim
+    else
+      return @idle_anim
     end
   end
 end

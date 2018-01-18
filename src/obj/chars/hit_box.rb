@@ -1,5 +1,5 @@
 class HitBox
-  attr_accessor :x, :y, :w, :h, :crs, :impact
+  attr_accessor :x, :y, :w, :h, :impact
 
   def initialize(x, y, w, h)
     @x = x
@@ -29,8 +29,8 @@ class HitBox
     Gosu.draw_line(@x, @y + @h, draw_with, @x, @y, draw_with, @hb_z)
   end
 
-  def check_point_collision(x,y)
-    if x.between?(@x,@x+@w) && y.between?(@y,@y+@h)
+  def check_point_collision(x, y)
+    if x.between?(@x, @x+@w) && y.between?(@y, @y+@h)
       @impact = true
       return true
     end
@@ -38,6 +38,10 @@ class HitBox
   end
 
   def check_brute_collision(hb)
-
+    if hb.x < @x+@w && hb.x+hb.w > @x && hb.y < @y+@h && hb.y+hb.h > @y
+      @impact = true
+      return true
+    end
+    return false
   end
 end

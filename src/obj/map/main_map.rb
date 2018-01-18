@@ -4,18 +4,30 @@ class MainMap
   TILE_HEIGHT = 12
   TOTAL_HEIGHT = 800
   TOTAL_WIDTH = 800
-  attr_accessor :solid_hbs
+  attr_accessor :solid_hbs, :enemies
 
   def initialize
     @solid_hbs = []
+    @enemies = []
+    wolf = Wolf.new(120,120)
+    @enemies << wolf
   end
 
   def draw
     @bg.draw(1, 1, 1)
+    @enemies.each do |enemy|
+      enemy.draw
+    end
     if $WINDOW.draw_hb
       @solid_hbs.each do |hitbox|
         hitbox.draw
       end
+    end
+  end
+
+  def update
+    @enemies.each do |enemy|
+      enemy.update
     end
   end
 
@@ -223,5 +235,4 @@ class MainMap
       end
     }
   end
-
 end

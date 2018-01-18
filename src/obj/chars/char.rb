@@ -2,12 +2,14 @@ require '../../src/obj/game_states'
 require_relative 'hit_box'
 
 class Char
-  attr_accessor :state, :face_dir, :sprite_offset_x, :sprite_offset_y, :action_tiks, :hb, :char_speed
+  attr_accessor :state, :face_dir, :sprite_offset_x, :sprite_offset_y, :event_tiks, :hb, :char_speed, :hp
 
   def initialize(x, y, w, h)
     @sprite = nil
-    @action_tiks = 0
+    @event_tiks = 0
     @hb = HitBox.new(x, y, w, h)
+    @recoil_speed_x
+    @recoil_speed_y
   end
 
   def idle?
@@ -41,8 +43,34 @@ class Char
     @sprite.change_state(id)
   end
 
+  def impacted(away_from)
+    @hp -= 1
+    angle = Gosu.angle(away_from[0], away_from[1], @hb.x, @hb.y)
+    @recoil_speed_x = Gosu.offset_x(angle, 3)
+    @recoil_speed_y = Gosu.offset_y(angle, 3)
+    change_state(GameStates::States::RECOILING)
+    @event_tiks = 25
+  end
+
   def update
     raise "UPDATE METHOD MUST BE OVERRIDEN"
+  end
+
+  def recoil
+    if @event_tiks > 17
+      new_hitbox = HitBox.new(@hb.x + @recoil_speed_x, @hb.y + @recoil_speed_y, @hb.w, @hb.h)
+      $WINDOW.current_map.solid_hbs.each do |hbs|
+        if hbs.check_brute_collision(new_hitbox)
+          @event_tiks -= 1
+          return
+        end
+      end
+      @hb.x += @recoil_speed_x
+      @hb.y += @recoil_speed_y
+    elsif @event_tiks <= 0
+      change_state(GameStates::States::MOVING)
+    end
+    @event_tiks -=1
   end
 
   def draw
@@ -55,41 +83,33 @@ class Char
   def move
     case @face_dir
       when GameStates::FaceDir::UP
-        x1 = @hb.x
-        x2 = @hb.x + @hb.w
-        y1 = @hb.y - char_speed
+        new_hitbox = HitBox.new(@hb.x, @hb.y - char_speed, @hb.w, @hb.h)
         $WINDOW.current_map.solid_hbs.each do |hbs|
-          if hbs.check_point_collision(x1, y1) || hbs.check_point_collision(x2, y1)
+          if hbs.check_brute_collision(new_hitbox)
             return
           end
         end
         @hb.y -= char_speed
       when GameStates::FaceDir::RIGHT
-        x1 = @hb.x + @hb.w + char_speed
-        y1 = @hb.y
-        y2 = @hb.y + @hb.h
+        new_hitbox = HitBox.new(@hb.x+char_speed, @hb.y, @hb.w, @hb.h)
         $WINDOW.current_map.solid_hbs.each do |hbs|
-          if hbs.check_point_collision(x1, y1) || hbs.check_point_collision(x1, y2)
+          if hbs.check_brute_collision(new_hitbox)
             return
           end
         end
         @hb.x += char_speed
       when GameStates::FaceDir::DOWN
-        x1 = @hb.x
-        x2 = @hb.x + @hb.w
-        y1 = @hb.y + @hb.h + char_speed
+        new_hitbox = HitBox.new(@hb.x, @hb.y + char_speed, @hb.w, @hb.h)
         $WINDOW.current_map.solid_hbs.each do |hbs|
-          if hbs.check_point_collision(x1, y1) || hbs.check_point_collision(x2, y1)
+          if hbs.check_brute_collision(new_hitbox)
             return
           end
         end
         @hb.y += char_speed
       when GameStates::FaceDir::LEFT
-        x1 = @hb.x - char_speed
-        y1 = @hb.y
-        y2 = @hb.y + @hb.h
+        new_hitbox = HitBox.new(@hb.x - char_speed, @hb.y, @hb.w, @hb.h)
         $WINDOW.current_map.solid_hbs.each do |hbs|
-          if hbs.check_point_collision(x1, y1) || hbs.check_point_collision(x1, y2)
+          if hbs.check_brute_collision(new_hitbox)
             return
           end
         end

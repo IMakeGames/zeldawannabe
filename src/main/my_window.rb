@@ -13,7 +13,7 @@ class MyWindow < Gosu::Window
 
   def initialize
     @fps = 50
-    @draw_hb = false
+    @draw_hb = true
     @color_red = Gosu::Color.argb(0xff_ff0000)
     @color_blue = Gosu::Color.argb(0xff_0000ff)
     @color_yellow = Gosu::Color.argb(0xff_ffff00)
@@ -22,11 +22,9 @@ class MyWindow < Gosu::Window
     @half_screen_width = ((WINDOW_WIDTH/3)/2).ceil
     @map_offsetx = 0
     @map_offsety = 0
-    @redraw = true
     @command_stack = []
-    @initiating = true
+    @initializing_map= true
     @kb_locked = false
-    self.caption = 'Hello World!'
   end
 
   def button_down(id)
@@ -54,10 +52,6 @@ class MyWindow < Gosu::Window
         dir =  GameStates::FaceDir::UP
       when Gosu::KB_DOWN
         dir = GameStates::FaceDir::DOWN
-      when Gosu::KB_A
-        @command_stack.delete_if{ |hash|
-          hash.keys.last == :ATTACK
-        }
     end
     @command_stack.delete_if{ |hash|
       hash.values.last == dir
@@ -68,8 +62,8 @@ class MyWindow < Gosu::Window
     #PLAYER UPDATE
     @player.update
 
-    #NPC UPDATE
-    #@wolf.update
+    #MAP UPDATE
+    @current_map.update
 
     #WINDOW SCROLLING
     if @player.hb.y > @half_screen_height
@@ -83,13 +77,12 @@ class MyWindow < Gosu::Window
   def draw
     Gosu.translate(@map_offsetx, @map_offsety) {
       Gosu.scale(3, 3) {
-        if @initiating
+        if @initializing_map
           @current_map.draw_bg
-          @initiating = false
+          @initializing_map = false
         else
           @current_map.draw
           @player.draw
-          #@wolf.draw
           #Gosu::Font.new(10).draw(Gosu.fps,2,2,2,1,1,$COLOR_BLUE)
         end
       }
@@ -98,9 +91,6 @@ class MyWindow < Gosu::Window
 
   def init_objects
     @current_map = MainMap.new
-    #@wolf = Wolf.new
-    @player = Mc.new
-    @player.place(100, 100)
-    #@wolf.place(120, 120)
+    @player = Mc.new(100,100)
   end
 end
