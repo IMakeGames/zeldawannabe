@@ -85,6 +85,7 @@ class Wolf < Char
     @can_move_x = true
     @can_move_y = true
 
+    super
   end
 
   def perform_attack

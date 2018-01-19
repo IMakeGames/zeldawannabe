@@ -5,14 +5,16 @@ require_relative 'hit_box'
 class Char < GameObject
 
   attr_accessor :state, :face_dir, :event_tiks, :char_speed, :current_hp, :total_hp, :can_move_x, :can_move_y,
-                :recoil_ticks, :attack_dmg
+                :recoil_ticks, :attack_dmg, :recoil_magnitude
 
   def initialize(x, y, w, h)
-    super(x,y,w,h)
+    super(x, y, w, h)
     @event_tiks = 0
     @recoil_ticks = 28
     @recoil_speed_x
     @recoil_speed_y
+    @recoil_magnitude = 4
+    @invis_frames = 0
     @can_move_x = true
     @can_move_y = true
   end
@@ -51,17 +53,21 @@ class Char < GameObject
     @sprite.change_state(id)
   end
 
-  def impacted(away_from,attack_dmg)
+  def impacted(away_from, attack_dmg)
     @current_hp -= attack_dmg
     angle = Gosu.angle(away_from[0], away_from[1], @hb.x, @hb.y)
-    @recoil_speed_x = Gosu.offset_x(angle, 4)
-    @recoil_speed_y = Gosu.offset_y(angle, 4)
+    @recoil_speed_x = Gosu.offset_x(angle, @recoil_magnitude)
+    @recoil_speed_y = Gosu.offset_y(angle, @recoil_magnitude)
     change_state(GameStates::States::RECOILING)
     @event_tiks = @current_hp > 0 ? @recoil_ticks : 18
   end
 
   def update
-    raise "UPDATE METHOD MUST BE OVERRIDEN"
+
+    #TODO UNCLIPS EVERY 4 FRAMES
+    if $WINDOW.global_frame_counter%4 == 0 && !(dying? || attacking?) && @invis_frames <= 0
+      unclip
+    end
   end
 
   def recoil
@@ -125,6 +131,30 @@ class Char < GameObject
 
   def normal?
     return @state != GameStates::States::RECOILING && @state != GameStates::States::DYING
+  end
+
+  #TODO: THIS METHOD IS EXPERIMENTAL, IT WILL PROBABLY NEED MUCH MORE WORK. TO DO PENDANT
+  def unclip
+    loop do
+      must_do = false
+      $WINDOW.current_map.game_objects.each do |ob|
+        next if ob.id == 1 || ob.id == self.id
+        if ob.hb.check_brute_collision(@hb)
+          must_do = true
+          clipping = true
+          while (clipping)
+            angle = Gosu.angle(ob.hb.x, ob.hb.y, @hb.x, @hb.y)
+            add_x = Gosu.offset_x(angle, 1)
+            add_y = Gosu.offset_y(angle, 1)
+            place(@hb.x+add_x, @hb.y+add_y)
+            if !ob.hb.check_brute_collision(@hb)
+              clipping = false
+            end
+          end
+        end
+      end
+      break if !must_do
+    end
   end
 
 end

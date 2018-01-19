@@ -16,11 +16,11 @@ class HitBox
 
   def draw
     if @impact
-      draw_with = $WINDOW.color_yellow
+      draw_with = Gosu::Color::YELLOW
       @impact = false
       @hb_z = 3
     else
-      draw_with = $WINDOW.color_red
+      draw_with = Gosu::Color::RED
       @hb_z = 2
     end
     Gosu.draw_line(@x, @y, draw_with, @x + @w, @y, draw_with, @hb_z)

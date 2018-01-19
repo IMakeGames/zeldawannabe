@@ -6,8 +6,8 @@ require '../../src/obj/interface'
 require '../../src/obj/map/main_map'
 
 class MyWindow < Gosu::Window
-  attr_reader :fps, :draw_hb, :color_red, :color_blue, :color_yellow, :w_height, :w_width, :player, :current_map,
-              :kb_locked, :command_stack, :interface
+  attr_reader :fps, :draw_hb, :w_height, :w_width, :player, :current_map, :kb_locked, :command_stack, :interface,
+              :global_frame_counter
   attr_writer :kb_locked
   WINDOW_HEIGHT = 720
   WINDOW_WIDTH = 800
@@ -15,9 +15,7 @@ class MyWindow < Gosu::Window
   def initialize
     @fps = 50
     @draw_hb = false
-    @color_red = Gosu::Color.argb(0xff_ff0000)
-    @color_blue = Gosu::Color.argb(0xff_0000ff)
-    @color_yellow = Gosu::Color.argb(0xff_ffff00)
+
     super WINDOW_WIDTH, WINDOW_HEIGHT, update_interval: 1000/@fps
     @half_screen_height = ((WINDOW_HEIGHT/3)/2).ceil
     @half_screen_width = ((WINDOW_WIDTH/3)/2).ceil
@@ -26,6 +24,7 @@ class MyWindow < Gosu::Window
     @command_stack = []
     @initializing_map= true
     @kb_locked = false
+    @global_frame_counter = 0
   end
 
   def button_down(id)
@@ -92,6 +91,7 @@ class MyWindow < Gosu::Window
     if @player.hb.x > @half_screen_width
       @map_offsetx = (@half_screen_width - @player.hb.x)
     end
+    @global_frame_counter = @global_frame_counter < 51 ? @global_frame_counter + 1 : 0
   end
 
   def draw

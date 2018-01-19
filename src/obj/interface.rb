@@ -24,7 +24,7 @@ class Interface
       @needs_redraw = false
     end
     if @next_print_red
-      Gosu.draw_rect(0, 0, 267, 60, $WINDOW.color_red, 100)
+      Gosu.draw_rect(0, 0, 267, 60, Gosu::Color::RED, 100)
       @next_print_red = false
     else
       @interface.draw(0, 0, 100)

@@ -16,10 +16,9 @@ class Mc < Char
     @current_hp = 12
     change_dir(GameStates::FaceDir::DOWN)
     change_state(GameStates::States::IDLE)
-
+    @recoil_magnitude = 8
     #@sword_initial_angle = @sia
     @sia = 0
-    @invis_frames = 0
   end
 
   def update
@@ -49,6 +48,8 @@ class Mc < Char
       end
     end
     @invis_frames = @invis_frames > 0 ? @invis_frames - 1 : 0
+
+    super
   end
 
   def impacted(away_from, attack_dmg)
