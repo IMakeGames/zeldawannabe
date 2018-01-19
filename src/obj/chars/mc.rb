@@ -10,6 +10,7 @@ class Mc < Char
     @sprite = McSprite.new
     @char_speed = 1.8
     @recoil_ticks = 20
+    @attack_dmg = 1
     @sah = []
     @total_hp = 12
     @current_hp = 12
@@ -42,18 +43,22 @@ class Mc < Char
       if recoiling?
         recoil
       end
+      if dying?
+        @event_tiks -= 1
+        puts @event_tiks
+      end
     end
     @invis_frames = @invis_frames > 0 ? @invis_frames - 1 : 0
   end
 
-  def impacted(away_from)
+  def impacted(away_from, attack_dmg)
     if @state == GameStates::States::ATTACKING
       @sah = []
       $WINDOW.command_stack.delete_if {|hash|
         hash.keys.last == :ATTACK
       }
     end
-    super(away_from)
+    super(away_from, attack_dmg)
     $WINDOW.kb_locked = true
     @invis_frames = 40
     $WINDOW.interface.update
@@ -61,10 +66,11 @@ class Mc < Char
 
   def recoil
     super
-    if @event_tiks <= 0 && @hp > 0
+    if @event_tiks <= 0 && @current_hp > 0
       $WINDOW.kb_locked = false
-    elsif @event_tiks <= 0 && @hp < 0
-      $WINDOW.player_dead
+    end
+    if @current_hp <= 0 && dying?
+      @event_tiks = 61
     end
     if @event_tiks%2 > 0
       $WINDOW.interface.next_print_red
@@ -97,7 +103,7 @@ class Mc < Char
     @sah.each do |hb|
       $WINDOW.current_map.enemies.each do |enemy|
         if !enemy.dying? && !enemy.recoiling? && hb.check_brute_collision(enemy.hb)
-          enemy.impacted(@hb.midpoint)
+          enemy.impacted(@hb.midpoint, @attack_dmg)
         end
       end
     end
@@ -114,13 +120,16 @@ class Mc < Char
   end
 
   def draw
-    super
-    if $WINDOW.draw_hb
-      @sah.each do |hb|
-        hb.draw
+    if dead?
+      @sprite.draw_dead(@hb.x, @hb.y, @z_rendering)
+    else
+      super
+      if $WINDOW.draw_hb
+        @sah.each do |hb|
+          hb.draw
+        end
       end
     end
-
   end
 
   def rotate_sword(angle)
@@ -132,5 +141,9 @@ class Mc < Char
     @sah[0].place(@hb.midpoint[0]+Gosu.offset_x(angle, 10), mid_point_adjusted+Gosu.offset_y(angle, 10))
 
     @sah[1].place(@hb.midpoint[0]+Gosu.offset_x(angle, 13), mid_point_adjusted+Gosu.offset_y(angle, 14))
+  end
+
+  def dead?
+    return dying? && @event_tiks <= 0
   end
 end

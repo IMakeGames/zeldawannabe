@@ -77,13 +77,13 @@ class MyWindow < Gosu::Window
 
   def update
     #PLAYER UPDATE
-    @player.update
+    @player.update unless @player.dead?
 
     #TODO: ADD FIRST HEART SCALING EFFECT
     #@interface.update
 
     #MAP UPDATE
-    @current_map.update
+    @current_map.update unless @player.dying? || @player.dead?
 
     #WINDOW SCROLLING
     if @player.hb.y > @half_screen_height

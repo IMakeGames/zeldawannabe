@@ -4,8 +4,8 @@ require_relative 'hit_box'
 
 class Char < GameObject
 
-  attr_accessor :state, :face_dir, :event_tiks, :char_speed, :current_hp, :total_hp, :can_move_x, :can_move_y
-                :recoil_ticks
+  attr_accessor :state, :face_dir, :event_tiks, :char_speed, :current_hp, :total_hp, :can_move_x, :can_move_y,
+                :recoil_ticks, :attack_dmg
 
   def initialize(x, y, w, h)
     super(x,y,w,h)
@@ -51,8 +51,8 @@ class Char < GameObject
     @sprite.change_state(id)
   end
 
-  def impacted(away_from)
-    @current_hp -= 1
+  def impacted(away_from,attack_dmg)
+    @current_hp -= attack_dmg
     angle = Gosu.angle(away_from[0], away_from[1], @hb.x, @hb.y)
     @recoil_speed_x = Gosu.offset_x(angle, 4)
     @recoil_speed_y = Gosu.offset_y(angle, 4)
@@ -80,7 +80,7 @@ class Char < GameObject
         change_state(GameStates::States::DYING)
         @event_tiks = 20
       else
-        change_state(GameStates::States::MOVING)
+        change_state(GameStates::States::IDLE)
       end
     end
     @event_tiks -=1

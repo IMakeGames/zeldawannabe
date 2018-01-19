@@ -37,6 +37,9 @@ class McSprite < Sprite
         when GameStates::States::RECOILING
           @loop = true
           @total = 8
+        when GameStates::States::DYING
+          @loop = true
+          @total = 20
       end
 
       @animation = gime_right_anim
@@ -119,12 +122,18 @@ class McSprite < Sprite
     @up_sword_attacking = [@atk[8], @atk[9], @atk[10], @atk[11]]
     @left_sword_attacking = [@atk[12], @atk[13], @atk[14], @atk[15]]
 
+    @dying = [@imgs[0],@imgs[30],@imgs[20],@imgs[10]]
+
+    @dead  = @imgs[59]
+
   end
 
   def gime_right_anim
     offset18x20
     if recoiling?
       return @damaged
+    elsif dying?
+      return @dying
     else
       case @face_dir
         when GameStates::FaceDir::UP
@@ -174,6 +183,10 @@ class McSprite < Sprite
   def offset18x20
     @offset_x = -6
     @offset_y = -9
+  end
+
+  def draw_dead(x,y,z)
+    @dead.draw(x+@offset_x+5, y+@offset_y+4, z)
   end
 
 end

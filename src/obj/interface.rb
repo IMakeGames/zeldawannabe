@@ -38,7 +38,7 @@ class Interface
     else
       diff = @playerHP - $WINDOW.player.current_hp
       heart_i = @hearts.count - 1
-      while diff > 0 && heart_i > 0
+      while diff > 0 && heart_i >= 0
         if @hearts[heart_i].empty?
           heart_i -= 1
           next

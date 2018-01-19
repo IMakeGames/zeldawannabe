@@ -12,6 +12,7 @@ class Wolf < Char
     change_state(GameStates::States::IDLE)
     @attack_x_speed = 0
     @attack_y_speed = 0
+    @attack_dmg = 2
     @until_next_attack_check = 100
     @total_hp = 4
     @current_hp = 4
@@ -74,7 +75,7 @@ class Wolf < Char
     end
 
     if normal? && $WINDOW.player.invis_frames <= 0 && !$WINDOW.player.recoiling? && @hb.check_brute_collision($WINDOW.player.hb)
-      $WINDOW.player.impacted(@hb.midpoint)
+      $WINDOW.player.impacted(@hb.midpoint, @attack_dmg)
     end
 
     if Gosu.distance(@hb.x,@hb.y,$WINDOW.player.hb.x, $WINDOW.player.hb.y) > 250
