@@ -11,9 +11,11 @@ class Mc < Char
     @char_speed = 1.8
     @recoil_ticks = 20
     @sah = []
-    @hp = 10
+    @total_hp = 12
+    @current_hp = 12
     change_dir(GameStates::FaceDir::DOWN)
     change_state(GameStates::States::IDLE)
+
     #@sword_initial_angle = @sia
     @sia = 0
     @invis_frames = 0
@@ -54,12 +56,18 @@ class Mc < Char
     super(away_from)
     $WINDOW.kb_locked = true
     @invis_frames = 40
+    $WINDOW.interface.update
   end
 
   def recoil
     super
-    if @event_tiks <= 0
+    if @event_tiks <= 0 && @hp > 0
       $WINDOW.kb_locked = false
+    elsif @event_tiks <= 0 && @hp < 0
+      $WINDOW.player_dead
+    end
+    if @event_tiks%2 > 0
+      $WINDOW.interface.next_print_red
     end
   end
 

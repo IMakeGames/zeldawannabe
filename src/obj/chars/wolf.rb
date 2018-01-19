@@ -13,7 +13,8 @@ class Wolf < Char
     @attack_x_speed = 0
     @attack_y_speed = 0
     @until_next_attack_check = 100
-    @hp = 4
+    @total_hp = 4
+    @current_hp = 4
   end
 
   def update

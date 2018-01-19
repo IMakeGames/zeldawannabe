@@ -7,7 +7,7 @@ require '../../src/obj/map/main_map'
 
 class MyWindow < Gosu::Window
   attr_reader :fps, :draw_hb, :color_red, :color_blue, :color_yellow, :w_height, :w_width, :player, :current_map,
-              :kb_locked, :command_stack
+              :kb_locked, :command_stack, :interface
   attr_writer :kb_locked
   WINDOW_HEIGHT = 720
   WINDOW_WIDTH = 800
@@ -79,6 +79,9 @@ class MyWindow < Gosu::Window
     #PLAYER UPDATE
     @player.update
 
+    #TODO: ADD FIRST HEART SCALING EFFECT
+    #@interface.update
+
     #MAP UPDATE
     @current_map.update
 
@@ -110,7 +113,7 @@ class MyWindow < Gosu::Window
 
   def init_objects
     @current_map = MainMap.new
-    @interface = Interface.new
     @player = Mc.new(100, 100)
+    @interface = Interface.new
   end
 end
