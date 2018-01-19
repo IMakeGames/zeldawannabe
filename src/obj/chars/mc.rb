@@ -54,7 +54,7 @@ class Mc < Char
 
   def impacted(away_from, attack_dmg)
     if @state == GameStates::States::ATTACKING
-      @sah = []
+      @sah.clear
       $WINDOW.command_stack.delete_if {|hash|
         hash.keys.last == :ATTACK
       }
@@ -80,7 +80,7 @@ class Mc < Char
 
   def attack
     change_state(GameStates::States::ATTACKING)
-    @event_tiks =13
+    @event_tiks =11
 
     #@sword_attack_hitboxes = @sah
     @sah = [HitBox.new(0, 0, 2, 3), HitBox.new(0, 0, 2, 3)]
@@ -99,7 +99,7 @@ class Mc < Char
   end
 
   def perform_attack
-    @sia += 9
+    @sia += 10
     rotate_sword(@sia)
     @sah.each do |hb|
       $WINDOW.current_map.enemies.each do |enemy|
@@ -111,7 +111,7 @@ class Mc < Char
 
     if @event_tiks == 0
       change_state(GameStates::States::IDLE)
-      @sah = []
+      @sah.clear
       $WINDOW.command_stack.delete_if {|hash|
         hash.keys.last == :ATTACK
       }

@@ -10,7 +10,7 @@ class Char < GameObject
   def initialize(x, y, w, h)
     super(x, y, w, h)
     @event_tiks = 0
-    @recoil_ticks = 28
+    @recoil_ticks = 26
     @recoil_speed_x
     @recoil_speed_y
     @recoil_magnitude = 4
@@ -155,6 +155,10 @@ class Char < GameObject
       end
       break if !must_do
     end
+  end
+
+  def die
+    $WINDOW.current_map.remove_from_game(self)
   end
 
 end

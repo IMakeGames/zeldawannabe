@@ -34,6 +34,19 @@ class MainMap
     end
   end
 
+  def remove_from_game(obj)
+    if obj.is_a?(Char)
+      @enemies.delete_if{|enemy| enemy.id == obj.id}
+    end
+    @game_objects.delete_if{|object| object.id == obj.id}
+  end
+
+  def set_indices
+    @game_objects.each_with_index do |go, index|
+      go.id = index unless index == 1
+    end
+  end
+
   def draw_bg
     map_sprites = Gosu::Image.load_tiles("../../assets/sprites/Mapas/forest_floor_tiles.png", TILE_WIDTH, TILE_HEIGHT, retro: true)
     plain_d = map_sprites[0]
@@ -240,11 +253,4 @@ class MainMap
       end
     }
   end
-
-  def set_indices
-    @game_objects.each_with_index do |go, index|
-      go.id = index unless index == 1
-    end
-  end
-
 end

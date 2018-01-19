@@ -3,7 +3,7 @@ require '../../src/obj/chars/char'
 require '../anims/wolf_sprite'
 class Wolf < Char
   CHAR_ACC = 0.2
-  ATTACK_PROBABILITY = 35
+  ATTACK_PROBABILITY = 25
 
   def initialize(x, y)
     super(x, y, 6, 8)
@@ -51,6 +51,7 @@ class Wolf < Char
 
       if @until_next_attack_check <= 0
         dieroll = Gosu.random(1,101)
+        puts "DIE ROLL = " + dieroll.to_s
         if dieroll <= ATTACK_PROBABILITY
           puts "GONNA ATTACK"
           change_state(GameStates::States::ATTACKING)
@@ -71,7 +72,7 @@ class Wolf < Char
     elsif recoiling?
       recoil
     elsif dying?
-      @event_tiks == 0 ? $WINDOW.current_map.enemies.delete(self) : @event_tiks -= 1
+      @event_tiks == 0 ? die : @event_tiks -= 1
     end
 
     if normal? && $WINDOW.player.invis_frames <= 0 && !$WINDOW.player.recoiling? && @hb.check_brute_collision($WINDOW.player.hb)
