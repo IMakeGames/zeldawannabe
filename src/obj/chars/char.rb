@@ -1,15 +1,20 @@
 require '../../src/obj/game_states'
+require '../../src/obj/game_object'
 require_relative 'hit_box'
 
-class Char
-  attr_accessor :state, :face_dir, :sprite_offset_x, :sprite_offset_y, :event_tiks, :hb, :char_speed, :hp
+class Char < GameObject
+
+  attr_accessor :state, :face_dir, :event_tiks, :char_speed, :hp, :can_move_x, :can_move_y
+                :recoil_ticks
 
   def initialize(x, y, w, h)
-    @sprite = nil
+    super(x,y,w,h)
     @event_tiks = 0
-    @hb = HitBox.new(x, y, w, h)
+    @recoil_ticks = 28
     @recoil_speed_x
     @recoil_speed_y
+    @can_move_x = true
+    @can_move_y = true
   end
 
   def idle?
@@ -52,7 +57,7 @@ class Char
     @recoil_speed_x = Gosu.offset_x(angle, 4)
     @recoil_speed_y = Gosu.offset_y(angle, 4)
     change_state(GameStates::States::RECOILING)
-    @event_tiks = @hp > 0 ? 28 : 18
+    @event_tiks = @hp > 0 ? @recoil_ticks : 18
   end
 
   def update
@@ -62,8 +67,8 @@ class Char
   def recoil
     if @event_tiks > 17 && @event_tiks < 25
       new_hitbox = HitBox.new(@hb.x + @recoil_speed_x, @hb.y + @recoil_speed_y, @hb.w, @hb.h)
-      $WINDOW.current_map.solid_hbs.each do |hbs|
-        if hbs.check_brute_collision(new_hitbox)
+      $WINDOW.current_map.solid_tiles.each do |tile|
+        if tile.hb.check_brute_collision(new_hitbox)
           @event_tiks -= 1
           return
         end
@@ -81,43 +86,36 @@ class Char
     @event_tiks -=1
   end
 
-  def draw
-    if $WINDOW.draw_hb
-      @hb.draw
-    end
-    @sprite.animate_linear(@hb.x, @hb.y, 1)
-  end
-
   def move
     case @face_dir
       when GameStates::FaceDir::UP
         new_hitbox = HitBox.new(@hb.x, @hb.y - char_speed, @hb.w, @hb.h)
-        $WINDOW.current_map.solid_hbs.each do |hbs|
-          if hbs.check_brute_collision(new_hitbox)
+        $WINDOW.current_map.solid_tiles.each do |tile|
+          if tile.hb.check_brute_collision(new_hitbox)
             return
           end
         end
         @hb.y -= char_speed
       when GameStates::FaceDir::RIGHT
         new_hitbox = HitBox.new(@hb.x+char_speed, @hb.y, @hb.w, @hb.h)
-        $WINDOW.current_map.solid_hbs.each do |hbs|
-          if hbs.check_brute_collision(new_hitbox)
+        $WINDOW.current_map.solid_tiles.each do |tile|
+          if tile.hb.check_brute_collision(new_hitbox)
             return
           end
         end
         @hb.x += char_speed
       when GameStates::FaceDir::DOWN
         new_hitbox = HitBox.new(@hb.x, @hb.y + char_speed, @hb.w, @hb.h)
-        $WINDOW.current_map.solid_hbs.each do |hbs|
-          if hbs.check_brute_collision(new_hitbox)
+        $WINDOW.current_map.solid_tiles.each do |tile|
+          if tile.hb.check_brute_collision(new_hitbox)
             return
           end
         end
         @hb.y += char_speed
       when GameStates::FaceDir::LEFT
         new_hitbox = HitBox.new(@hb.x - char_speed, @hb.y, @hb.w, @hb.h)
-        $WINDOW.current_map.solid_hbs.each do |hbs|
-          if hbs.check_brute_collision(new_hitbox)
+        $WINDOW.current_map.solid_tiles.each do |tile|
+          if tile.hb.check_brute_collision(new_hitbox)
             return
           end
         end
@@ -128,4 +126,5 @@ class Char
   def normal?
     return @state != GameStates::States::RECOILING && @state != GameStates::States::DYING
   end
+
 end

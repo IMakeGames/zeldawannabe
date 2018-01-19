@@ -57,9 +57,9 @@ class WolfSprite < Sprite
       @frame_num = 1
 
       #TODO: THIS CODE CAN HELP ANALIZING THE ANIMATIONS' TIME DURATION
-      if state == GameStates::States::RECOILING
-        puts "anim count = "+@animation.count.to_s+" total duration = "+@total.to_s+" frame duration = "+ @frame_duration.to_s
-      end
+      # if state == GameStates::States::RECOILING
+      #   puts "anim count = "+@animation.count.to_s+" total duration = "+@total.to_s+" frame duration = "+ @frame_duration.to_s
+      # end
     end
   end
 
@@ -68,7 +68,7 @@ class WolfSprite < Sprite
       animate_attack(x, y, z)
     else
       if @counter.between?(@frame_duration*(@frame_num - 1), @frame_duration*@frame_num)
-        @img = @animation[@frame_num -1]
+        @img = @frame_num - 1 < @animation.count ? @animation[@frame_num -1] : @animation[@animation.count -1]
       else
         @frame_num += 1
       end
@@ -105,7 +105,7 @@ class WolfSprite < Sprite
     @idle_anim = [@imgs[0], @imgs[1]]
     @walking_anim = [@imgs[4], @imgs[2], @imgs[5]]
     @preparing_attack = [@imgs[3], @imgs[4]]
-    @attacking = [@imgs[6], @imgs[7], @imgs[3]]
+    @attacking = [@imgs[3],@imgs[6], @imgs[7], @imgs[3]]
     @recoiling = [@imgs[8], @imgs[9]]
     @dying = [@imgs[8], @imgs[10], @imgs[11], @imgs[12], @imgs[13]]
   end

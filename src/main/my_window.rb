@@ -29,8 +29,21 @@ class MyWindow < Gosu::Window
   end
 
   def button_down(id)
+    #TODO: DRAWS HITBOXES TO TEST STUFF
     if id == Gosu::KB_H
       @draw_hb = @draw_hb ? false : true
+    end
+    #TODO: DRAWS WHATEVER ELSE NEEDS TESTING
+    if id == Gosu::KB_C
+      puts "SOLID TILES COUNT = " + @current_map.solid_tiles.count.to_s
+      @current_map.solid_tiles.each_with_index do |tile, index|
+        puts "Tile #{index}) x,y{#{tile.x},#{tile.y}} height = #{tile.h} width = #{tile.w}"
+      end
+
+      puts "SOLID HITBOXES COUNT = " + @current_map.solid_hbs.count.to_s
+      @current_map.solid_hbs.each_with_index do |tile, index|
+        puts "Hitbox #{index}) x,y{#{tile.x},#{tile.y}} height = #{tile.h} width = #{tile.w}"
+      end
     end
     case id
       when Gosu::KB_LEFT
@@ -84,6 +97,7 @@ class MyWindow < Gosu::Window
       Gosu.translate(@map_offsetx-1, @map_offsety+59) {
         if @initializing_map
           @current_map.draw_bg
+          @current_map.set_indices
           @initializing_map = false
         else
           @current_map.draw

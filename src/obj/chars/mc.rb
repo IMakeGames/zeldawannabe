@@ -3,12 +3,13 @@ require '../../src/obj/chars/char'
 require '../anims/mc_sprite'
 class Mc < Char
   attr_reader :invis_frames
-  CHAR_ACC = 0.2
 
   def initialize(x, y)
     super(x, y, 6, 8)
+    @id = 1
     @sprite = McSprite.new
-    @char_speed = 2
+    @char_speed = 1.8
+    @recoil_ticks = 20
     @sah = []
     @hp = 10
     change_dir(GameStates::FaceDir::DOWN)

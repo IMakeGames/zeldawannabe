@@ -1,16 +1,19 @@
-require '../../src/obj/map/map_tile'
+require '../../src/obj/map/tile'
 class MainMap
   TILE_WIDTH = 12
   TILE_HEIGHT = 12
   TOTAL_HEIGHT = 800
   TOTAL_WIDTH = 800
-  attr_accessor :solid_hbs, :enemies
+  attr_accessor :solid_tiles, :enemies, :game_objects
 
   def initialize
-    @solid_hbs = []
+    @solid_tiles = []
+    @game_objects = []
     @enemies = []
-    wolf = Wolf.new(120,120)
-    @enemies << wolf
+    wolf1 = Wolf.new(120,120)
+    wolf2 = Wolf.new(120,90)
+    @enemies << wolf1 << wolf2
+    @game_objects << wolf1 << wolf2
   end
 
   def draw
@@ -19,8 +22,8 @@ class MainMap
       enemy.draw
     end
     if $WINDOW.draw_hb
-      @solid_hbs.each do |hitbox|
-        hitbox.draw
+      @solid_tiles.each do |tile|
+        tile.draw
       end
     end
   end
@@ -228,11 +231,20 @@ class MainMap
           if !sprite_to_set.nil?
             sprite_to_set.draw(x*TILE_WIDTH, y*TILE_HEIGHT, 1)
             if solid
-              @solid_hbs << HitBox.new(x*TILE_WIDTH, y*TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT)
+              solid_tile = Tile.new(x*TILE_WIDTH, y*TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT)
+              @solid_tiles  << solid_tile
+              @game_objects << solid_tile
             end
           end
         end
       end
     }
   end
+
+  def set_indices
+    @game_objects.each_with_index do |go, index|
+      go.id = index unless index == 1
+    end
+  end
+
 end

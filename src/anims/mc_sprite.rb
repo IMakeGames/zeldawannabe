@@ -27,10 +27,10 @@ class McSprite < Sprite
       case state
         when GameStates::States::MOVING
           @loop = true
-          @total = WALKING_ANIM_DURATION*$WINDOW.fps
+          @total = 30
         when GameStates::States::IDLE
           @loop = true
-          @total = IDLE_ANIM_DURATION*$WINDOW.fps
+          @total = 80
         when GameStates::States::ATTACKING
           @loop = false
           @total = 13
