@@ -49,10 +49,10 @@ class Char
   def impacted(away_from)
     @hp -= 1
     angle = Gosu.angle(away_from[0], away_from[1], @hb.x, @hb.y)
-    @recoil_speed_x = Gosu.offset_x(angle, 3)
-    @recoil_speed_y = Gosu.offset_y(angle, 3)
+    @recoil_speed_x = Gosu.offset_x(angle, 4)
+    @recoil_speed_y = Gosu.offset_y(angle, 4)
     change_state(GameStates::States::RECOILING)
-    @event_tiks = 25
+    @event_tiks = @hp > 0 ? 28 : 18
   end
 
   def update
@@ -60,7 +60,7 @@ class Char
   end
 
   def recoil
-    if @event_tiks > 17
+    if @event_tiks > 17 && @event_tiks < 25
       new_hitbox = HitBox.new(@hb.x + @recoil_speed_x, @hb.y + @recoil_speed_y, @hb.w, @hb.h)
       $WINDOW.current_map.solid_hbs.each do |hbs|
         if hbs.check_brute_collision(new_hitbox)
@@ -71,7 +71,12 @@ class Char
       @hb.x += @recoil_speed_x
       @hb.y += @recoil_speed_y
     elsif @event_tiks <= 0
-      change_state(GameStates::States::MOVING)
+      if hp <=0
+        change_state(GameStates::States::DYING)
+        @event_tiks = 20
+      else
+        change_state(GameStates::States::MOVING)
+      end
     end
     @event_tiks -=1
   end
@@ -118,5 +123,9 @@ class Char
         end
         @hb.x -= char_speed
     end
+  end
+
+  def normal?
+    return @state != GameStates::States::RECOILING && @state != GameStates::States::DYING
   end
 end

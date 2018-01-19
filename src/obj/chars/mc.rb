@@ -6,7 +6,7 @@ class Mc < Char
   CHAR_ACC = 0.2
 
   def initialize(x, y)
-    super(x, y, 8, 10)
+    super(x, y, 6, 8)
     @sprite = McSprite.new
     @char_speed = 2
     @sah = []
@@ -44,6 +44,12 @@ class Mc < Char
   end
 
   def impacted(away_from)
+    if @state == GameStates::States::ATTACKING
+      @sah = []
+      $WINDOW.command_stack.delete_if {|hash|
+        hash.keys.last == :ATTACK
+      }
+    end
     super(away_from)
     $WINDOW.kb_locked = true
     @invis_frames = 40
@@ -58,7 +64,7 @@ class Mc < Char
 
   def attack
     change_state(GameStates::States::ATTACKING)
-    @event_tiks =0.3*$WINDOW.fps
+    @event_tiks =13
 
     #@sword_attack_hitboxes = @sah
     @sah = [HitBox.new(0, 0, 2, 3), HitBox.new(0, 0, 2, 3)]
@@ -77,19 +83,19 @@ class Mc < Char
   end
 
   def perform_attack
-    @sia += 8
+    @sia += 9
     rotate_sword(@sia)
     @sah.each do |hb|
       $WINDOW.current_map.enemies.each do |enemy|
-        if !enemy.recoiling? && hb.check_brute_collision(enemy.hb)
+        if !enemy.dying? && !enemy.recoiling? && hb.check_brute_collision(enemy.hb)
           enemy.impacted(@hb.midpoint)
         end
       end
     end
 
     if @event_tiks == 0
-      @sah = []
       change_state(GameStates::States::IDLE)
+      @sah = []
       $WINDOW.command_stack.delete_if {|hash|
         hash.keys.last == :ATTACK
       }
@@ -109,8 +115,13 @@ class Mc < Char
   end
 
   def rotate_sword(angle)
-    @sah[0].place(@hb.midpoint[0]+Gosu.offset_x(angle, 10), @hb.midpoint[1]+Gosu.offset_y(angle, 10))
+    mid_point_adjusted = @hb.midpoint[1]
+    case @face_dir
+      when GameStates::FaceDir::DOWN
+        mid_point_adjusted -= 3
+    end
+    @sah[0].place(@hb.midpoint[0]+Gosu.offset_x(angle, 10), mid_point_adjusted+Gosu.offset_y(angle, 10))
 
-    @sah[1].place(@hb.midpoint[0]+Gosu.offset_x(angle, 14), @hb.midpoint[1]+Gosu.offset_y(angle, 16))
+    @sah[1].place(@hb.midpoint[0]+Gosu.offset_x(angle, 13), mid_point_adjusted+Gosu.offset_y(angle, 14))
   end
 end

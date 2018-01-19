@@ -6,21 +6,17 @@ class Wolf < Char
   ATTACK_PROBABILITY = 40
 
   def initialize(x, y)
-    super(x, y, 8, 10)
+    super(x, y, 6, 8)
     @face_dir = GameStates::FaceDir::LEFT
     @sprite = WolfSprite.new
-    @sprite_offset_x = -6
-    @sprite_offset_y = -9
     @attack_x_speed = 0
     @attack_y_speed = 0
     @until_next_attack_check = 120
-    @hp = 3
+    @hp = 4
   end
 
   def update
-    if @hp <= 0
-      die
-    elsif moving?
+    if moving?
       angle = Gosu.angle($WINDOW.player.hb.x, $WINDOW.player.hb.y, @hb.x, @hb.y)
       move_x = Gosu.offset_x(angle,1)
       move_y = Gosu.offset_y(angle,1)
@@ -51,9 +47,11 @@ class Wolf < Char
       perform_attack
     elsif recoiling?
       recoil
+    elsif dying?
+      @event_tiks == 0 ? $WINDOW.current_map.enemies.delete(self) : @event_tiks -= 1
     end
 
-    if $WINDOW.player.invis_frames <= 0 && !$WINDOW.player.recoiling? && @hb.check_brute_collision($WINDOW.player.hb)
+    if normal? && $WINDOW.player.invis_frames <= 0 && !$WINDOW.player.recoiling? && @hb.check_brute_collision($WINDOW.player.hb)
       $WINDOW.player.impacted(@hb.midpoint)
     end
   end
@@ -65,7 +63,7 @@ class Wolf < Char
       @attack_x_speed = Gosu.offset_x(angle,3)
       @attack_y_speed = Gosu.offset_y(angle,3)
     end
-    if @event_tiks <= 20
+    if @event_tiks <= 20 && @event_tiks > 0
     new_hitbox = HitBox.new(@hb.x - @attack_x_speed, @hb.y - @attack_y_speed, @hb.w, @hb.h)
       $WINDOW.current_map.solid_hbs.each do |hbs|
         if hbs.check_brute_collision(new_hitbox)

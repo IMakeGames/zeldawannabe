@@ -44,7 +44,10 @@ class WolfSprite < Sprite
           @total = 20
         when GameStates::States::RECOILING
           @loop = true
-          @total = 13
+          @total = 6
+        when GameStates::States::DYING
+          @loop = false
+          @total = 20
       end
 
       @counter = 0
@@ -52,10 +55,11 @@ class WolfSprite < Sprite
       @frame_duration = (@total/@animation.count).floor
       @total = (@frame_duration*@animation.count) < @total ? @frame_duration*@animation.count : @total
       @frame_num = 1
+
       #TODO: THIS CODE CAN HELP ANALIZING THE ANIMATIONS' TIME DURATION
-      # if state == GameStates::States::ATTACKING
-      #   puts "anim count = "+@animation.count.to_s+" total duration = "+@total.to_s+" frame duration = "+ @frame_duration.to_s
-      # end
+      if state == GameStates::States::RECOILING
+        puts "anim count = "+@animation.count.to_s+" total duration = "+@total.to_s+" frame duration = "+ @frame_duration.to_s
+      end
     end
   end
 
@@ -125,5 +129,4 @@ class WolfSprite < Sprite
   def preping_attack?
     return @state == GameStates::States::CUSTOM
   end
-
 end

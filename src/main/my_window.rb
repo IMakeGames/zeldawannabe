@@ -14,7 +14,7 @@ class MyWindow < Gosu::Window
 
   def initialize
     @fps = 50
-    @draw_hb = true
+    @draw_hb = false
     @color_red = Gosu::Color.argb(0xff_ff0000)
     @color_blue = Gosu::Color.argb(0xff_0000ff)
     @color_yellow = Gosu::Color.argb(0xff_ffff00)
