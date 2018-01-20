@@ -19,38 +19,9 @@ class Char < GameObject
     @can_move_y = true
   end
 
-  def idle?
-    return @state == GameStates::States::IDLE
-  end
-
-  def moving?
-    return @state == GameStates::States::MOVING
-  end
-
-  def attacking?
-    return @state == GameStates::States::ATTACKING
-  end
-
-  def recoiling?
-    return @state == GameStates::States::RECOILING
-  end
-
-  def dying?
-    return @state == GameStates::States::DYING
-  end
-
-  def place(x, y)
-    @hb.place(x, y)
-  end
-
   def change_dir(dir)
     @face_dir = dir
     @sprite.change_dir(dir)
-  end
-
-  def change_state(id)
-    @state = id
-    @sprite.change_state(id)
   end
 
   def impacted(away_from, attack_dmg)
@@ -137,7 +108,7 @@ class Char < GameObject
   def unclip
     loop do
       must_do = false
-      $WINDOW.current_map.game_objects.each do |ob|
+      $WINDOW.current_map.solid_game_objects.each do |ob|
         next if ob.id == 1 || ob.id == self.id
         if ob.hb.check_brute_collision(@hb)
           must_do = true
@@ -156,9 +127,4 @@ class Char < GameObject
       break if !must_do
     end
   end
-
-  def die
-    $WINDOW.current_map.remove_from_game(self)
-  end
-
 end

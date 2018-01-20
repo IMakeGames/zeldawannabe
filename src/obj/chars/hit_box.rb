@@ -18,10 +18,10 @@ class HitBox
     if @impact
       draw_with = Gosu::Color::YELLOW
       @impact = false
-      @hb_z = 3
+      @hb_z = 1000
     else
-      draw_with = Gosu::Color::RED
-      @hb_z = 2
+      draw_with = Gosu::Color::BLUE
+      @hb_z = 1001
     end
     Gosu.draw_line(@x, @y, draw_with, @x + @w, @y, draw_with, @hb_z)
     Gosu.draw_line(@x + @w, @y, draw_with, @x + @w, @y + @h, draw_with, @hb_z)

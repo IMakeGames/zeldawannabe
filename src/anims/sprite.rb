@@ -19,5 +19,13 @@ class Sprite
   def dying?
     return @state == GameStates::States::DYING
   end
-  
+
+  def animate_linear(x,y,z)
+    raise "MUST BE OVERRIDEN"
+  end
+
+  def change_state(state)
+    @state = state
+  end
+
 end

@@ -1,25 +1,34 @@
 require '../../src/obj/map/tile'
+require '../../src/obj/map/map objects/bush'
 class MainMap
   TILE_WIDTH = 12
   TILE_HEIGHT = 12
   TOTAL_HEIGHT = 800
   TOTAL_WIDTH = 800
-  attr_accessor :solid_tiles, :enemies, :game_objects
+  attr_accessor :solid_tiles, :enemies, :solid_game_objects, :bushes, :drops
 
   def initialize
     @solid_tiles = []
-    @game_objects = []
+    @solid_game_objects = []
+    @bushes = []
     @enemies = []
+    @drops = []
     wolf1 = Wolf.new(120,120)
     wolf2 = Wolf.new(120,90)
     @enemies << wolf1 << wolf2
-    @game_objects << wolf1 << wolf2
+    @solid_game_objects << wolf1 << wolf2
   end
 
   def draw
     @bg.draw(1, 1, 1)
     @enemies.each do |enemy|
       enemy.draw
+    end
+    @bushes.each do |bush|
+      bush.draw
+    end
+    @drops.each do |drop|
+      drop.draw
     end
     if $WINDOW.draw_hb
       @solid_tiles.each do |tile|
@@ -29,20 +38,29 @@ class MainMap
   end
 
   def update
-    @enemies.each do |enemy|
-      enemy.update
+    # @enemies.each do |enemy|
+    #   enemy.update
+    # end
+    @bushes.each do |bush|
+      bush.update
+    end
+    @drops.each do |drop|
+      drop.update unless drop.idle?
     end
   end
 
   def remove_from_game(obj)
     if obj.is_a?(Char)
       @enemies.delete_if{|enemy| enemy.id == obj.id}
+    elsif obj.is_a?(Bush)
+      puts "DELETING BUSH"
+      @bushes.delete(obj)
     end
-    @game_objects.delete_if{|object| object.id == obj.id}
+    @solid_game_objects.delete_if{|object| object.id == obj.id}
   end
 
   def set_indices
-    @game_objects.each_with_index do |go, index|
+    @solid_game_objects.each_with_index do |go, index|
       go.id = index unless index == 1
     end
   end
@@ -105,6 +123,8 @@ class MainMap
     hedge_tree2_2 = map_sprites[55]
     hedge_tree2_3 = map_sprites[62]
     hedge_tree2_4 = map_sprites[63]
+
+    bush          = map_sprites[45]
 
     f = File.open("../../src/obj/map/map1_layout.txt")
     @bg = Gosu.record(600, 600) {
@@ -239,15 +259,20 @@ class MainMap
               sprite_to_set = hedge_tree2_3
             when 'R'
               sprite_to_set = hedge_tree2_4
-
+            when '?'
+              puts "there's a bush"
+              sprite_to_set = bush
+              @bushes << Bush.new(x*TILE_WIDTH, y*TILE_HEIGHT)
           end
           if !sprite_to_set.nil?
             sprite_to_set.draw(x*TILE_WIDTH, y*TILE_HEIGHT, 1)
             if solid
               solid_tile = Tile.new(x*TILE_WIDTH, y*TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT)
               @solid_tiles  << solid_tile
-              @game_objects << solid_tile
+              @solid_game_objects << solid_tile
             end
+
+
           end
         end
       end

@@ -29,7 +29,7 @@ class Wolf < Char
       move_y = Gosu.offset_y(angle,1)
 
       new_hitbox = HitBox.new(@hb.x - move_x, @hb.y, @hb.w, @hb.h)
-      $WINDOW.current_map.game_objects.each do |ob|
+      $WINDOW.current_map.solid_game_objects.each do |ob|
         next if ob.id == 1 || ob.id == self.id
         if ob.hb.check_brute_collision(new_hitbox)
           @can_move_x = false
@@ -38,7 +38,7 @@ class Wolf < Char
       end
 
       new_hitbox = HitBox.new(@hb.x, @hb.y - move_y, @hb.w, @hb.h)
-      $WINDOW.current_map.game_objects.each do |ob|
+      $WINDOW.current_map.solid_game_objects.each do |ob|
         next if ob.id == 1 || ob.id == self.id
         if ob.hb.check_brute_collision(new_hitbox)
           @can_move_y = false
@@ -50,7 +50,7 @@ class Wolf < Char
       @hb.y = @can_move_y ? @hb.y - move_y : @hb.y
 
       if @until_next_attack_check <= 0
-        dieroll = Gosu.random(1,101)
+        dieroll = Random.rand(100)
         puts "DIE ROLL = " + dieroll.to_s
         if dieroll <= ATTACK_PROBABILITY
           puts "GONNA ATTACK"

@@ -107,6 +107,11 @@ class Mc < Char
           enemy.impacted(@hb.midpoint, @attack_dmg)
         end
       end
+      $WINDOW.current_map.bushes.each do |bush|
+        if hb.check_brute_collision(bush.hb)
+          bush.impacted
+        end
+      end
     end
 
     if @event_tiks == 0
@@ -134,14 +139,19 @@ class Mc < Char
   end
 
   def rotate_sword(angle)
-    mid_point_adjusted = @hb.midpoint[1]
+    mid_point_adjusted_y = @hb.midpoint[1]
+    mid_point_adjusted_x = @hb.midpoint[0]
     case @face_dir
       when GameStates::FaceDir::DOWN
-        mid_point_adjusted -= 3
+        mid_point_adjusted_y -= 2
+      when GameStates::FaceDir::LEFT
+        mid_point_adjusted_x -= 3
+      when GameStates::FaceDir::UP
+        mid_point_adjusted_y -= 3
     end
-    @sah[0].place(@hb.midpoint[0]+Gosu.offset_x(angle, 10), mid_point_adjusted+Gosu.offset_y(angle, 10))
+    @sah[0].place(mid_point_adjusted_x+Gosu.offset_x(angle, 10), mid_point_adjusted_y+Gosu.offset_y(angle, 10))
 
-    @sah[1].place(@hb.midpoint[0]+Gosu.offset_x(angle, 13), mid_point_adjusted+Gosu.offset_y(angle, 14))
+    @sah[1].place(mid_point_adjusted_x+Gosu.offset_x(angle, 13), mid_point_adjusted_y+Gosu.offset_y(angle, 14))
   end
 
   def dead?
