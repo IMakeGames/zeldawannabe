@@ -19,7 +19,7 @@ class DropSprite < Sprite
       @y_vel += @y_acc
       @sprite.draw(x-3, @y_pos, z)
     else
-      @sprite.draw(x-3, y-4, z)
+      @sprite.draw(x-3, y-3, z)
     end
   end
 end

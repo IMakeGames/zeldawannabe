@@ -49,6 +49,12 @@ class Mc < Char
     end
     @invis_frames = @invis_frames > 0 ? @invis_frames - 1 : 0
 
+    $WINDOW.current_map.drops.each do |drop|
+      if drop.idle? && drop.hb.check_brute_collision(@hb)
+        drop.die
+        drop_picked(drop.class)
+      end
+    end
     super
   end
 
@@ -63,6 +69,7 @@ class Mc < Char
     $WINDOW.kb_locked = true
     @invis_frames = 40
     $WINDOW.interface.update
+    puts "PLAYER'S HP = #{@current_hp}"
   end
 
   def recoil
@@ -149,12 +156,21 @@ class Mc < Char
       when GameStates::FaceDir::UP
         mid_point_adjusted_y -= 3
     end
-    @sah[0].place(mid_point_adjusted_x+Gosu.offset_x(angle, 10), mid_point_adjusted_y+Gosu.offset_y(angle, 10))
+    @sah[0].place(mid_point_adjusted_x+Gosu.offset_x(angle, 8), mid_point_adjusted_y+Gosu.offset_y(angle, 8))
 
     @sah[1].place(mid_point_adjusted_x+Gosu.offset_x(angle, 13), mid_point_adjusted_y+Gosu.offset_y(angle, 14))
   end
 
   def dead?
     return dying? && @event_tiks <= 0
+  end
+
+  def drop_picked(type)
+    puts "type " + type.to_s
+    if type == HeartDrop
+      @current_hp = @current_hp + 4 >= @total_hp ? @total_hp : @current_hp + 4
+      $WINDOW.interface.update
+      puts "PLAYER'S HP = #{@current_hp}"
+    end
   end
 end

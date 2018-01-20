@@ -38,9 +38,9 @@ class MainMap
   end
 
   def update
-    # @enemies.each do |enemy|
-    #   enemy.update
-    # end
+    @enemies.each do |enemy|
+      enemy.update
+    end
     @bushes.each do |bush|
       bush.update
     end
@@ -53,8 +53,9 @@ class MainMap
     if obj.is_a?(Char)
       @enemies.delete_if{|enemy| enemy.id == obj.id}
     elsif obj.is_a?(Bush)
-      puts "DELETING BUSH"
       @bushes.delete(obj)
+    elsif obj.is_a?(HeartDrop)
+      @drops.delete(obj)
     end
     @solid_game_objects.delete_if{|object| object.id == obj.id}
   end

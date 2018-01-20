@@ -7,7 +7,7 @@ require '../../src/obj/map/main_map'
 
 class MyWindow < Gosu::Window
   attr_reader :fps, :draw_hb, :w_height, :w_width, :player, :current_map, :kb_locked, :command_stack, :interface,
-              :global_frame_counter
+              :global_frame_counter, :color_value
   attr_writer :kb_locked
   WINDOW_HEIGHT = 720
   WINDOW_WIDTH = 800
@@ -34,15 +34,7 @@ class MyWindow < Gosu::Window
     end
     #TODO: DRAWS WHATEVER ELSE NEEDS TESTING
     if id == Gosu::KB_C
-      puts "SOLID TILES COUNT = " + @current_map.solid_tiles.count.to_s
-      @current_map.solid_tiles.each_with_index do |tile, index|
-        puts "Tile #{index}) x,y{#{tile.x},#{tile.y}} height = #{tile.h} width = #{tile.w}"
-      end
-
-      puts "SOLID HITBOXES COUNT = " + @current_map.solid_hbs.count.to_s
-      @current_map.solid_hbs.each_with_index do |tile, index|
-        puts "Hitbox #{index}) x,y{#{tile.x},#{tile.y}} height = #{tile.h} width = #{tile.w}"
-      end
+      perform_custom_action
     end
     case id
       when Gosu::KB_LEFT
@@ -109,11 +101,28 @@ class MyWindow < Gosu::Window
         end
       }
     }
+
   end
 
   def init_objects
     @current_map = MainMap.new
     @player = Mc.new(100, 100)
     @interface = Interface.new
+  end
+
+  def perform_custom_action
+    # puts "SOLID TILES COUNT = " + @current_map.solid_tiles.count.to_s
+    # @current_map.solid_tiles.each_with_index do |tile, index|
+    #   puts "Tile #{index}) x,y{#{tile.x},#{tile.y}} height = #{tile.h} width = #{tile.w}"
+    # end
+    #
+    # puts "SOLID HITBOXES COUNT = " + @current_map.solid_hbs.count.to_s
+    # @current_map.solid_hbs.each_with_index do |tile, index|
+    #   puts "Hitbox #{index}) x,y{#{tile.x},#{tile.y}} height = #{tile.h} width = #{tile.w}"
+    # end
+    # if @alpha_channel > 0
+    #   @alpha_channel -= 1
+    #   puts "ALPHA CHANNEL VALUE: #{@alpha_channel}"
+    # end
   end
 end

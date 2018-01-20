@@ -29,7 +29,6 @@ class Interface
     else
       @interface.draw(0, 0, 100)
     end
-
   end
 
   def update
@@ -37,19 +36,30 @@ class Interface
       @hearts[0].hp = 0
     else
       diff = @playerHP - $WINDOW.player.current_hp
-      heart_i = @hearts.count - 1
-      while diff > 0 && heart_i >= 0
-        if @hearts[heart_i].empty?
-          heart_i -= 1
-          next
-        else
-          @hearts[heart_i].hp -= 1
-          diff -= 1
+      heart_i = diff > 0 ? @hearts.count - 1 : 0
+      while diff != 0 && heart_i >= 0
+        if diff > 0
+          if @hearts[heart_i].empty?
+            heart_i -= 1
+            next
+          else
+            @hearts[heart_i].hp -= 1
+            diff -= 1
+          end
+        elsif diff < 0
+          if @hearts[heart_i].hp >= 4
+            heart_i += 1
+          else
+            @hearts[heart_i].hp += 1
+            diff +=1
+          end
         end
       end
     end
+
     @playerHP = $WINDOW.player.current_hp
     @needs_redraw = true
+    puts "PLAYER'S HP ACCORDING TO INTERFACE: #{@playerHP}"
   end
 
   def recalculate_hearts
