@@ -9,7 +9,6 @@ class WolfSprite < Sprite
     @counter = 0
     @offset_x = -5
     @offset_y = -5
-    @loop = true
   end
 
   def change_dir(dir)

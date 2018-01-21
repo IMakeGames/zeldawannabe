@@ -5,7 +5,7 @@ class Mc < Char
   attr_reader :invis_frames
 
   def initialize(x, y)
-    super(x, y, 6, 8)
+    super(x, y, 6, 8, true)
     @id = 1
     @sprite = McSprite.new
     @char_speed = 1.8

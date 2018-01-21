@@ -1,12 +1,11 @@
-require 'gosu'
 require '../../src/obj/chars/char'
 require '../anims/wolf_sprite'
 class Wolf < Char
   CHAR_ACC = 0.2
-  ATTACK_PROBABILITY = 25
+  ATTACK_PROBABILITY = 30
 
   def initialize(x, y)
-    super(x, y, 6, 8)
+    super(x, y, 6, 8, true)
     @face_dir = GameStates::FaceDir::LEFT
     @sprite = WolfSprite.new
     change_state(GameStates::States::IDLE)
@@ -24,30 +23,7 @@ class Wolf < Char
         change_state(GameStates::States::MOVING)
       end
     elsif moving?
-      angle = Gosu.angle($WINDOW.player.hb.x, $WINDOW.player.hb.y, @hb.x, @hb.y)
-      move_x = Gosu.offset_x(angle,1)
-      move_y = Gosu.offset_y(angle,1)
-
-      new_hitbox = HitBox.new(@hb.x - move_x, @hb.y, @hb.w, @hb.h)
-      $WINDOW.current_map.solid_game_objects.each do |ob|
-        next if ob.id == 1 || ob.id == self.id
-        if ob.hb.check_brute_collision(new_hitbox)
-          @can_move_x = false
-          break
-        end
-      end
-
-      new_hitbox = HitBox.new(@hb.x, @hb.y - move_y, @hb.w, @hb.h)
-      $WINDOW.current_map.solid_game_objects.each do |ob|
-        next if ob.id == 1 || ob.id == self.id
-        if ob.hb.check_brute_collision(new_hitbox)
-          @can_move_y = false
-          break
-        end
-      end
-
-      @hb.x = @can_move_x ? @hb.x - move_x : @hb.x
-      @hb.y = @can_move_y ? @hb.y - move_y : @hb.y
+      approach($WINDOW.player,1)
 
       if @until_next_attack_check <= 0
         dieroll = Random.rand(100)
@@ -79,7 +55,7 @@ class Wolf < Char
       $WINDOW.player.impacted(@hb.midpoint, @attack_dmg)
     end
 
-    if Gosu.distance(@hb.x,@hb.y,$WINDOW.player.hb.x, $WINDOW.player.hb.y) > 250
+    if !idle? && Gosu.distance(@hb.x,@hb.y,$WINDOW.player.hb.x, $WINDOW.player.hb.y) > 250
       change_state(GameStates:States::IDLE)
     end
 

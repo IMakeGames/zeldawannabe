@@ -4,10 +4,10 @@ require_relative 'hit_box'
 
 class Char < GameObject
 
-  attr_accessor :state, :face_dir, :event_tiks, :char_speed, :current_hp, :total_hp, :can_move_x, :can_move_y,
-                :recoil_ticks, :attack_dmg, :recoil_magnitude
+  attr_accessor :state, :face_dir, :event_tiks, :char_speed, :current_hp, :total_hp, :recoil_ticks, :attack_dmg,
+                :recoil_magnitude, :solid
 
-  def initialize(x, y, w, h)
+  def initialize(x, y, w, h, solid)
     super(x, y, w, h)
     @event_tiks = 0
     @recoil_ticks = 26
@@ -15,8 +15,7 @@ class Char < GameObject
     @recoil_speed_y
     @recoil_magnitude = 4
     @invis_frames = 0
-    @can_move_x = true
-    @can_move_y = true
+    @solid = solid
   end
 
   def change_dir(dir)
@@ -33,6 +32,7 @@ class Char < GameObject
     @event_tiks = @current_hp > 0 ? @recoil_ticks : 18
   end
 
+  #TODO: THE TICKS SUBTRACTING AT THE END OF UPDATE IS RATHER CONFUSING AND PERHAPS IT WOULD BE A GOOD IDEA TO WORK TOWARDS ORGINIZING IT
   def update
 
     #TODO UNCLIPS EVERY 4 FRAMES
@@ -61,6 +61,41 @@ class Char < GameObject
       end
     end
     @event_tiks -=1
+  end
+
+  def approach(object, magnitude)
+    @can_move_x = true
+    @can_move_y = true
+    angle = Gosu.angle(object.hb.x, object.hb.y, @hb.x, @hb.y)
+    move_x = Gosu.offset_x(angle, magnitude)
+    move_y = Gosu.offset_y(angle, magnitude)
+
+    if @solid
+      new_hitbox = HitBox.new(@hb.x - move_x, @hb.y, @hb.w, @hb.h)
+      $WINDOW.current_map.solid_game_objects.each do |ob|
+        next if ob.id == 1 || ob.id == self.id
+        if ob.hb.check_brute_collision(new_hitbox)
+          @can_move_x = false
+          break
+        end
+      end
+
+      new_hitbox = HitBox.new(@hb.x, @hb.y - move_y, @hb.w, @hb.h)
+      $WINDOW.current_map.solid_game_objects.each do |ob|
+        next if ob.id == 1 || ob.id == self.id
+        if ob.hb.check_brute_collision(new_hitbox)
+          @can_move_y = false
+          break
+        end
+      end
+    end
+
+    @hb.x = @can_move_x ? @hb.x - move_x : @hb.x
+    @hb.y = @can_move_y ? @hb.y - move_y : @hb.y
+  end
+
+  def distance(object,magnitude)
+    approach(object,-1*magnitude)
   end
 
   def move

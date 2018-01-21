@@ -1,5 +1,6 @@
 require '../../src/obj/map/tile'
 require '../../src/obj/map/map objects/bush'
+require '../obj/chars/bat'
 class MainMap
   TILE_WIDTH = 12
   TILE_HEIGHT = 12
@@ -10,13 +11,16 @@ class MainMap
   def initialize
     @solid_tiles = []
     @solid_game_objects = []
+    @inactive_enemies = []
     @bushes = []
     @enemies = []
     @drops = []
     wolf1 = Wolf.new(120,120)
     wolf2 = Wolf.new(120,90)
-    @enemies << wolf1 << wolf2
-    @solid_game_objects << wolf1 << wolf2
+    bat1 = Bat.new(80,120)
+    #@enemies << wolf1 << wolf2
+    @inactive_enemies << bat1
+    #@solid_game_objects << wolf1 << wolf2
   end
 
   def draw
@@ -38,6 +42,28 @@ class MainMap
   end
 
   def update
+    if $WINDOW.global_frame_counter == 50
+      to_add = []
+      to_remove = []
+      @inactive_enemies.each do |inen|
+        if Gosu.distance($WINDOW.player.hb.x,$WINDOW.player.hb.y,inen.hb.x,inen.hb.y) < 300
+          to_add << inen
+          @inactive_enemies.delete(inen)
+        end
+      end
+      @enemies.each do |inen|
+        if Gosu.distance($WINDOW.player.hb.x,$WINDOW.player.hb.y,inen.hb.x,inen.hb.y) > 300
+          to_remove << inen
+          @enemies.delete(inen)
+        end
+      end
+      to_add.each do |toadd|
+        @enemies << toadd
+      end
+      to_remove.each do |tremove|
+        @inactive_enemies << tremove
+      end
+    end
     @enemies.each do |enemy|
       enemy.update
     end

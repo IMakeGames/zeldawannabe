@@ -111,6 +111,7 @@ class MyWindow < Gosu::Window
   end
 
   def perform_custom_action
+    #puts "angle between player and bat" + Gosu.angle(@player.hb.x, @player.hb.y, @current_map.enemies.first.hb.x,  @current_map.enemies.first.hb.y).to_s
     # puts "SOLID TILES COUNT = " + @current_map.solid_tiles.count.to_s
     # @current_map.solid_tiles.each_with_index do |tile, index|
     #   puts "Tile #{index}) x,y{#{tile.x},#{tile.y}} height = #{tile.h} width = #{tile.w}"
