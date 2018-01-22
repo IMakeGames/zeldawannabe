@@ -5,12 +5,12 @@ require_relative 'hit_box'
 class Char < GameObject
 
   attr_accessor :state, :face_dir, :event_tiks, :char_speed, :current_hp, :total_hp, :recoil_ticks, :attack_dmg,
-                :recoil_magnitude, :solid
+                :recoil_magnitude, :solid, :invis_frames
 
   def initialize(x, y, w, h, solid)
     super(x, y, w, h)
     @event_tiks = 0
-    @recoil_ticks = 26
+    @recoil_ticks = 35
     @recoil_speed_x
     @recoil_speed_y
     @recoil_magnitude = 4
@@ -92,47 +92,49 @@ class Char < GameObject
 
     @hb.x = @can_move_x ? @hb.x - move_x : @hb.x
     @hb.y = @can_move_y ? @hb.y - move_y : @hb.y
+
+    return move_x
   end
 
-  def distance(object,magnitude)
+  def distance_from(object,magnitude)
     approach(object,-1*magnitude)
   end
 
   def move
     case @face_dir
       when GameStates::FaceDir::UP
-        new_hitbox = HitBox.new(@hb.x, @hb.y - char_speed, @hb.w, @hb.h)
-        $WINDOW.current_map.solid_tiles.each do |tile|
-          if tile.hb.check_brute_collision(new_hitbox)
-            return
-          end
-        end
-        @hb.y -= char_speed
+        move_in_y(char_speed,-1)
       when GameStates::FaceDir::RIGHT
-        new_hitbox = HitBox.new(@hb.x+char_speed, @hb.y, @hb.w, @hb.h)
-        $WINDOW.current_map.solid_tiles.each do |tile|
-          if tile.hb.check_brute_collision(new_hitbox)
-            return
-          end
-        end
-        @hb.x += char_speed
+        move_in_x(char_speed,1)
       when GameStates::FaceDir::DOWN
-        new_hitbox = HitBox.new(@hb.x, @hb.y + char_speed, @hb.w, @hb.h)
-        $WINDOW.current_map.solid_tiles.each do |tile|
-          if tile.hb.check_brute_collision(new_hitbox)
-            return
-          end
-        end
-        @hb.y += char_speed
+        move_in_y(char_speed,1)
       when GameStates::FaceDir::LEFT
-        new_hitbox = HitBox.new(@hb.x - char_speed, @hb.y, @hb.w, @hb.h)
-        $WINDOW.current_map.solid_tiles.each do |tile|
-          if tile.hb.check_brute_collision(new_hitbox)
-            return
-          end
-        end
-        @hb.x -= char_speed
+        move_in_x(char_speed,-1)
     end
+  end
+
+  def move_in_x(mag,orientation)
+    move_x = mag * orientation
+    new_hitbox = HitBox.new(@hb.x+move_x, @hb.y, @hb.w, @hb.h)
+    $WINDOW.current_map.solid_tiles.each do |tile|
+      if tile.hb.check_brute_collision(new_hitbox)
+        return true
+      end
+    end
+    @hb.x += move_x
+    return false
+  end
+
+  def move_in_y(mag,orientation)
+    move_y = mag*orientation
+    new_hitbox = HitBox.new(@hb.x, @hb.y+move_y, @hb.w, @hb.h)
+    $WINDOW.current_map.solid_tiles.each do |tile|
+      if tile.hb.check_brute_collision(new_hitbox)
+        return true
+      end
+    end
+    @hb.y += move_y
+    return false
   end
 
   def normal?

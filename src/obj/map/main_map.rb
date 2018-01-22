@@ -1,6 +1,7 @@
 require '../../src/obj/map/tile'
 require '../../src/obj/map/map objects/bush'
 require '../obj/chars/bat'
+require '../obj/chars/boar'
 class MainMap
   TILE_WIDTH = 12
   TILE_HEIGHT = 12
@@ -18,9 +19,11 @@ class MainMap
     wolf1 = Wolf.new(120,120)
     wolf2 = Wolf.new(120,90)
     bat1 = Bat.new(80,120)
-    #@enemies << wolf1 << wolf2
-    @inactive_enemies << bat1
-    #@solid_game_objects << wolf1 << wolf2
+    bat2 = Bat.new(120,120)
+    boar1 = Boar.new(150,90)
+    @enemies << boar1
+    #@inactive_enemies << bat1 << bat2
+    @solid_game_objects << boar1
   end
 
   def draw

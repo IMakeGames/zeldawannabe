@@ -3,8 +3,8 @@ class BatSprite < Sprite
   def initialize
     init_anim_sprites
     @counter = 0
-    @offset_x = -5
-    @offset_y = -5
+    @offset_x = -9
+    @offset_y = -3
     @loop = true
   end
 

@@ -23,7 +23,7 @@ class Wolf < Char
         change_state(GameStates::States::MOVING)
       end
     elsif moving?
-      approach($WINDOW.player,1)
+      move_x = approach($WINDOW.player,1)
 
       if @until_next_attack_check <= 0
         dieroll = Random.rand(100)
@@ -52,7 +52,7 @@ class Wolf < Char
     end
 
     if normal? && $WINDOW.player.invis_frames <= 0 && !$WINDOW.player.recoiling? && @hb.check_brute_collision($WINDOW.player.hb)
-      $WINDOW.player.impacted(@hb.midpoint, @attack_dmg)
+      $WINDOW.player.impacted(@hb.center, @attack_dmg)
     end
 
     if !idle? && Gosu.distance(@hb.x,@hb.y,$WINDOW.player.hb.x, $WINDOW.player.hb.y) > 250

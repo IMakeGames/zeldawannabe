@@ -2,7 +2,6 @@ require 'gosu'
 require '../../src/obj/chars/char'
 require '../anims/mc_sprite'
 class Mc < Char
-  attr_reader :invis_frames
 
   def initialize(x, y)
     super(x, y, 6, 8, true)
@@ -110,8 +109,8 @@ class Mc < Char
     rotate_sword(@sia)
     @sah.each do |hb|
       $WINDOW.current_map.enemies.each do |enemy|
-        if !enemy.dying? && !enemy.recoiling? && hb.check_brute_collision(enemy.hb)
-          enemy.impacted(@hb.midpoint, @attack_dmg)
+        if !enemy.dying? && ((!enemy.recoiling? && !enemy.is_a?(Boar)) || (enemy.is_a?(Boar) && enemy.invis_frames <= 0)) && hb.check_brute_collision(enemy.hb)
+          enemy.impacted(@hb.center, @attack_dmg)
         end
       end
       $WINDOW.current_map.bushes.each do |bush|
@@ -146,8 +145,8 @@ class Mc < Char
   end
 
   def rotate_sword(angle)
-    mid_point_adjusted_y = @hb.midpoint[1]
-    mid_point_adjusted_x = @hb.midpoint[0]
+    mid_point_adjusted_y = @hb.center[1]
+    mid_point_adjusted_x = @hb.center[0]
     case @face_dir
       when GameStates::FaceDir::DOWN
         mid_point_adjusted_y -= 2

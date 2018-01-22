@@ -71,7 +71,6 @@ class WolfSprite < Sprite
       else
         @frame_num += 1
       end
-      @counter += 1
 
       @img.draw(x + @offset_x + @reverse_offset_x, y + @offset_y, z, @x_scale)
 
@@ -85,6 +84,8 @@ class WolfSprite < Sprite
         end
       end
     end
+
+    @counter += 1
   end
 
   def animate_attack(x,y,z)

@@ -73,7 +73,6 @@ class McSprite < Sprite
     else
       @counter += 1
     end
-
       @img.draw(x+@offset_x, y+@offset_y, z)
   end
 
