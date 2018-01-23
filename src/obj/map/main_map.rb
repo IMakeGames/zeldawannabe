@@ -16,14 +16,6 @@ class MainMap
     @bushes = []
     @enemies = []
     @drops = []
-    wolf1 = Wolf.new(120,120)
-    wolf2 = Wolf.new(120,90)
-    bat1 = Bat.new(80,120)
-    bat2 = Bat.new(120,120)
-    boar1 = Boar.new(150,90)
-    @enemies << boar1
-    #@inactive_enemies << bat1 << bat2
-    @solid_game_objects << boar1
   end
 
   def draw
@@ -161,6 +153,7 @@ class MainMap
       f.each_with_index do |line, y|
         line.split(",").each_with_index do |n, x|
           solid = false
+          enemy = false
           case n
             when '1'
               sprite_to_set = plain
@@ -290,9 +283,13 @@ class MainMap
             when 'R'
               sprite_to_set = hedge_tree2_4
             when '?'
-              puts "there's a bush"
               sprite_to_set = bush
               @bushes << Bush.new(x*TILE_WIDTH, y*TILE_HEIGHT)
+              puts "Bush put"
+            when '!'
+              puts "Monster Set"
+              sprite_to_set = plain
+              enemy = true
           end
           if !sprite_to_set.nil?
             sprite_to_set.draw(x*TILE_WIDTH, y*TILE_HEIGHT, 1)
@@ -301,8 +298,21 @@ class MainMap
               @solid_tiles  << solid_tile
               @solid_game_objects << solid_tile
             end
-
-
+            if enemy
+              dieroll = Random.rand(100)
+              if dieroll.between?(0,40)
+                wolfie = Wolf.new(x*TILE_WIDTH,y*TILE_HEIGHT)
+                @enemies << wolfie
+                @solid_game_objects << wolfie
+              elsif dieroll.between?(41,70)
+                boar = Boar.new(x*TILE_WIDTH,y*TILE_HEIGHT)
+                @enemies << boar
+                @solid_game_objects << boar
+              else
+                battie = Boar.new(x*TILE_WIDTH,y*TILE_HEIGHT)
+                @enemies << battie
+              end
+            end
           end
         end
       end

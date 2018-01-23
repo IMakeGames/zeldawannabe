@@ -34,10 +34,11 @@ class BoarSprite < Sprite
         when GameStates::States::MOVING
           @loop = true
           @total = 25
-        #TODO: IDLE ANIMATION MUST BE LOOKED UPON
         when GameStates::States::IDLE
-          @loop = true
-          @total = 50
+          @total = 100
+          @index = 0
+          @img_pair = @idle_anim[@index]
+          return
         when GameStates::States::ATTACKING
           @loop = true
           @total = 6
@@ -104,9 +105,6 @@ class BoarSprite < Sprite
         if @loop
           @counter = 0
           @frame_num = 1
-          if idle?
-            change_dir(GameStates::FaceDir.opposite_of(@face_dir))
-          end
         end
       end
     end
@@ -117,21 +115,23 @@ class BoarSprite < Sprite
   end
 
   def animate_custom(x, y, z)
-    @img = @animation[@frame_num - 1].key
-    if @counter.between?(@frame_duration*(@frame_num - 1), @frame_duration*@frame_num)
-      @img = @frame_num - 1 < @animation.count ? @animation[@frame_num -1] : @animation[@animation.count -1]
-    else
-      @frame_num += 1
+    if @counter >= @total*@img_pair[1]
+      if @index < @idle_anim.count - 1
+        @index += 1
+      else
+        @index = 0
+        change_dir(GameStates::FaceDir.opposite_of(@face_dir))
+      end
+      @img_pair = @idle_anim[@index]
+      @counter = 0
     end
-    @counter += 1
-
-    @img.draw(x + @offset_x + @reverse_offset_x, y + @offset_y, z, @x_scale)
+    @img_pair[0].draw(x + @offset_x + @reverse_offset_x, y + @offset_y, z, @x_scale)
   end
 
 
   def init_anim_sprites
     @imgs = Gosu::Image.load_tiles("../../assets/sprites/Enemies/boar_25x14.png", 25, 14, retro: true)
-    @idle_anim = [@imgs[0] => 40, @imgs[1] => 15, @imgs[2] => 15, @imgs[1] => 15, @imgs[2] => 15]
+    @idle_anim = [[@imgs[0], 0.3], [@imgs[1], 0.1], [@imgs[2], 0.1], [@imgs[1], 0.1], [@imgs[2], 0.1],[@imgs[0],0.3]]
     @walking_anim = [@imgs[5], @imgs[6]]
     @aware = @imgs[4]
     @attacking = [@imgs[8], @imgs[9]]
@@ -148,8 +148,6 @@ class BoarSprite < Sprite
       return @attacking
     elsif dying?
       return @dying
-    elsif idle?
-      return @idle_anim
     end
   end
 end

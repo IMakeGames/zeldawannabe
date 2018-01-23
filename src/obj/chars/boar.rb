@@ -15,7 +15,6 @@ class Boar < Char
 
   def impacted(away_from, attack_dmg)
     @current_hp -= attack_dmg
-    puts "ENEMY IMPACTED. HP: #{@current_hp}, INVIS_FRAMES: #{@invis_frames}"
     @sprite.impacted = true
     @invis_frames = @current_hp > 0 ? 40 : 18
   end
@@ -94,7 +93,6 @@ class Boar < Char
       when GameStates::States::ATTACKING
         @event_tiks = 40
       when GameStates::States::RECOILING
-        puts "RECOILING"
         @event_tiks = 50
         @orientation = -@orientation
     end

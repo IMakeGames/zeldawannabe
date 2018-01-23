@@ -2,7 +2,7 @@ require '../../src/obj/chars/char'
 require '../anims/wolf_sprite'
 class Wolf < Char
   CHAR_ACC = 0.2
-  ATTACK_PROBABILITY = 30
+  ATTACK_PROBABILITY = 40
 
   def initialize(x, y)
     super(x, y, 6, 8, true)
@@ -27,9 +27,7 @@ class Wolf < Char
 
       if @until_next_attack_check <= 0
         dieroll = Random.rand(100)
-        puts "DIE ROLL = " + dieroll.to_s
         if dieroll <= ATTACK_PROBABILITY
-          puts "GONNA ATTACK"
           change_state(GameStates::States::ATTACKING)
           @event_tiks =60
         else

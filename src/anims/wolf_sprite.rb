@@ -83,9 +83,8 @@ class WolfSprite < Sprite
           end
         end
       end
+      @counter += 1
     end
-
-    @counter += 1
   end
 
   def animate_attack(x,y,z)
