@@ -2,6 +2,7 @@ require 'gosu'
 require '../../src/obj/chars/char'
 require '../anims/mc_sprite'
 class Mc < Char
+  attr_reader :unseathed
 
   def initialize(x, y)
     super(x, y, 6, 8, true)
@@ -16,33 +17,49 @@ class Mc < Char
     @sah = []
     @total_hp = 12
     @current_hp = 12
-    change_dir(GameStates::FaceDir::DOWN)
-    change_state(GameStates::States::IDLE)
     @recoil_magnitude = 8
     @until_next_attack = 0
     @until_next_roll = 0
+    @until_next_seath = 0
     #@sia means SWORD INITIAL ANGLE
     @sia = 0
+    @unseathed = false
   end
 
   def update
+    @face_dir == nil ? change_dir(GameStates::FaceDir::DOWN) : nil
     if !$WINDOW.kb_locked
       if $WINDOW.command_stack.empty?
         change_state(GameStates::States::IDLE)
-      elsif $WINDOW.command_stack.last[0] == :MOVE
+      elsif !blocking? && $WINDOW.command_stack.last[0] == :MOVE
         change_dir($WINDOW.command_stack.last[1])
         change_state(GameStates::States::MOVING)
-      elsif $WINDOW.command_stack.last[0] == :ATTACK && @until_next_attack <= 0
+      elsif $WINDOW.command_stack.last[0] == :ATTACKORITEM
+        if $WINDOW.command_stack.last[1] == :ATTACK && @until_next_attack <= 0
+          $WINDOW.kb_locked = true
+          attack
+          @until_next_attack = 7
+        else
+          $WINDOW.command_stack.delete_if{|command| command[0] == :ATTACKORITEM}
+        end
+      elsif $WINDOW.command_stack.last[0] == :ROLLORBLOCK
+        if $WINDOW.command_stack.last[1] == :ROLL && @until_next_roll <= 0
+          $WINDOW.kb_locked = true
+          @current_speed = 0
+          change_state(GameStates::States::ROLLING)
+          $WINDOW.command_stack.delete_if{|command| command[0] == :ROLLORBLOCK}
+          @event_tiks = 25
+          @until_next_roll = 15
+        elsif $WINDOW.command_stack.last[1] == :BLOCK && !blocking?
+          change_state(GameStates::States::BLOCKING)
+        end
+      elsif !blocking? && $WINDOW.command_stack.last[0] == :SEATH && @until_next_seath <= 0
         $WINDOW.kb_locked = true
-        attack
-        @until_next_attack = 7
-      elsif $WINDOW.command_stack.last[0] == :ROLL && @until_next_roll <= 0
-        $WINDOW.kb_locked = true
-        @current_speed = 0
-        change_state(GameStates::States::ROLLING)
-        $WINDOW.command_stack.delete_if{|command| command[0] == :ROLL}
-        @event_tiks = 25
-        @until_next_roll = 15
+        $WINDOW.command_stack.delete_if{|command| command[0] == :SEATH}
+        change_state(GameStates::States::SEATHING)
+        @unseathed = !@unseathed
+        @event_tiks =15
+        @until_next_seath = 15
       end
     else
       if attacking?
@@ -63,12 +80,19 @@ class Mc < Char
     elsif !rolling?
       @current_speed = @current_speed > 0 ?  @current_speed - @decel : 0
       move
-
     end
 
+    if seathing?
+      @event_tiks -= 1
+      if @event_tiks <= 0
+        change_state(GameStates::States::IDLE)
+        $WINDOW.kb_locked = false
+      end
+    end
     @invis_frames = @invis_frames > 0 ? @invis_frames - 1 : 0
     @until_next_roll = !rolling? && @until_next_roll > 0 ? @until_next_roll - 1 :   @until_next_roll
     @until_next_attack = !attacking? && @until_next_attack > 0 ? @until_next_attack - 1 : @until_next_attack
+    @until_next_seath = !seathing? && @until_next_seath > 0 ? @until_next_seath - 1 : @until_next_seath
 
     $WINDOW.current_map.drops.each do |drop|
       if drop.idle? && drop.hb.check_brute_collision(@hb)
@@ -79,6 +103,7 @@ class Mc < Char
     super
   end
 
+  #TODO: BLOCKING MUST BE IMPLEMENTED
   def impacted(away_from, attack_dmg)
     if @state == GameStates::States::ATTACKING
       @sah.clear
@@ -211,5 +236,9 @@ class Mc < Char
 
   def rolling?
     return @state == GameStates::States::ROLLING
+  end
+
+  def seathing?
+   return @state == GameStates::States::SEATHING
   end
 end

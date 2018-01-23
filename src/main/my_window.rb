@@ -46,9 +46,18 @@ class MyWindow < Gosu::Window
       when Gosu::KB_DOWN
         @command_stack << [:MOVE, GameStates::FaceDir::DOWN]
       when Gosu::KB_A
-        @kb_locked ? nil : @command_stack << [:ATTACK, Gosu::KB_A]
+        @kb_locked ? nil : @command_stack << [:ATTACKORITEM, Gosu::KB_A]
+        if !@kb_locked
+          to_add = @player.unseathed ? [:ATTACKORITEM, :ATTACK] : [:ATTACKORITEM, :ITEM]
+          @command_stack << to_add
+        end
       when Gosu::KB_SPACE
-        @kb_locked ? nil : @command_stack << [:ROLL, Gosu::KB_SPACE]
+        if !@kb_locked
+          to_add = @player.unseathed ? [:ROLLORBLOCK, :BLOCK] : [:ROLLORBLOCK, :ROLL]
+          @command_stack << to_add
+        end
+      when Gosu::KB_W
+        @kb_locked ? nil : @command_stack << [:SEATH, Gosu::KB_W]
     end
   end
 
@@ -62,6 +71,13 @@ class MyWindow < Gosu::Window
         dir = GameStates::FaceDir::UP
       when Gosu::KB_DOWN
         dir = GameStates::FaceDir::DOWN
+      when Gosu::KB_SPACE
+        if @player.blocking?
+          @command_stack.delete_if {|pair|
+            pair[1] == :BLOCK
+          }
+          @player.state = GameStates::States::IDLE
+        end
     end
     @command_stack.delete_if {|pair|
       pair[1] == dir

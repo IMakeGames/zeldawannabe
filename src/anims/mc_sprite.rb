@@ -6,12 +6,11 @@ class McSprite < Sprite
 
   def initialize
     init_anim_sprites
-    change_dir(GameStates::FaceDir::DOWN)
-    change_state(GameStates::States::IDLE)
     @counter = 0
     @offset_x = -6
     @offset_y = -9
     @loop = true
+    @reverse = false
   end
 
   def change_dir(dir)
@@ -43,6 +42,10 @@ class McSprite < Sprite
         when   GameStates::States::ROLLING
           @loop = false
           @total = 25
+        when GameStates::States::SEATHING
+          @reverse = $WINDOW.player.unseathed ? true : false
+          @loop = false
+          @total = 15
       end
 
       @animation = gime_right_anim
@@ -94,9 +97,13 @@ class McSprite < Sprite
     @left_walking_anim = [@imgs[30], @imgs[31], @imgs[30], @imgs[32]]
 
     @down_unseath = [@imgs[45], @imgs[46], @imgs[47], @imgs[48]]
+    @down_seath   = [@imgs[48], @imgs[47], @imgs[46], @imgs[45]]
     @right_unseath = [@imgs[55], @imgs[56], @imgs[57], @imgs[58]]
+    @right_seath  =  [@imgs[58], @imgs[57], @imgs[56], @imgs[55]]
     @up_unseath = [@imgs[65], @imgs[66], @imgs[67], @imgs[68]]
+    @up_seath   = [@imgs[68], @imgs[67], @imgs[66], @imgs[65]]
     @left_unseath = [@imgs[75], @imgs[76], @imgs[77], @imgs[78]]
+    @left_seath = [@imgs[78], @imgs[77], @imgs[76], @imgs[75]]
 
     @down_sword_idle_anim = [@imgs[40], @imgs[43], @imgs[44]]
     @right_sword_idle_anim = [@imgs[50], @imgs[53], @imgs[54]]
@@ -108,10 +115,10 @@ class McSprite < Sprite
     @up_sword_walking_anim = [@imgs[60], @imgs[61], @imgs[62]]
     @left_sword_walking_anim = [@imgs[70], @imgs[71], @imgs[72]]
 
-    @down_block = @imgs[35]
-    @right_block = @imgs[36]
-    @left_block = @imgs[37]
-    @up_block = @imgs[38]
+    @down_block = [@imgs[35]]
+    @right_block = [@imgs[36]]
+    @left_block = [@imgs[37]]
+    @up_block = [@imgs[38]]
 
     @damaged = [@imgs[39], @imgs[49]]
 
@@ -141,31 +148,39 @@ class McSprite < Sprite
       case @face_dir
         when GameStates::FaceDir::UP
           if moving?
-            return @up_walking_anim
+            return $WINDOW.player.unseathed ? @up_sword_walking_anim : @up_walking_anim
           elsif attacking?
             @offset_x = -10
             @offset_y = -14
             return @up_sword_attacking
           elsif rolling?
             return @up_rolling
+          elsif seathing?
+            return @reverse ? @up_seath : @up_unseath
+          elsif blocking?
+            return @up_block
           else
-            return @up_idle_anim
+            return $WINDOW.player.unseathed ? @up_sword_idle_anim : @up_idle_anim
           end
         when GameStates::FaceDir::DOWN
           if moving?
-            return @down_walking_anim
+            return $WINDOW.player.unseathed ? @down_sword_walking_anim : @down_walking_anim
           elsif attacking?
             @offset_x = -10
-            @offset_y = -8
+            @offset_y = -9
             return @down_sword_attacking
           elsif rolling?
             return @down_rolling
+          elsif seathing?
+            return @reverse ? @down_seath : @down_unseath
+          elsif blocking?
+            return @down_block
           else
-            return @down_idle_anim
+            return $WINDOW.player.unseathed ? @down_sword_idle_anim : @down_idle_anim
           end
         when GameStates::FaceDir::LEFT
           if moving?
-            return @left_walking_anim
+            return $WINDOW.player.unseathed ? @left_sword_walking_anim : @left_walking_anim
           elsif attacking?
             @offset_x = -13
             @offset_y = -8
@@ -174,20 +189,28 @@ class McSprite < Sprite
             @x_scale = -1
             @offset_x = 10
             return @side_rolling
+          elsif seathing?
+            return @reverse ? @left_seath  : @left_unseath
+          elsif blocking?
+            return @left_block
           else
-            return @left_idle_anim
+            return $WINDOW.player.unseathed ? @left_sword_idle_anim : @left_idle_anim
           end
         when GameStates::FaceDir::RIGHT
           if moving?
-            return @right_walking_anim
+            return $WINDOW.player.unseathed ? @right_sword_walking_anim : @right_walking_anim
           elsif attacking?
-            @offset_x = -10
+            @offset_x = -11
             @offset_y = -8
             return @right_sword_attacking
           elsif rolling?
             return @side_rolling
+          elsif seathing?
+            return @reverse ? @right_seath : @right_unseath
+          elsif blocking?
+            return @right_block
           else
-            return @right_idle_anim
+            return $WINDOW.player.unseathed ? @right_sword_idle_anim : @right_idle_anim
           end
       end
     end
@@ -204,6 +227,14 @@ class McSprite < Sprite
 
   def rolling?
     return @state == GameStates::States::ROLLING
+  end
+
+  def seathing?
+    return @state == GameStates::States::SEATHING
+  end
+
+  def blocking?
+    return @state == GameStates::States::BLOCKING
   end
 
 end

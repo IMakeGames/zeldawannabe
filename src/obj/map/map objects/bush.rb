@@ -38,7 +38,8 @@ class Bush < GameObject
     elsif dying?
       if @event_tiks <= 0
         dieroll = Random.rand(100)
-        if dieroll < 15
+        puts "dieroll: #{dieroll}"
+        if dieroll < 10
           $WINDOW.current_map.drops << HeartDrop.new(@hb.x,@hb.y)
         end
         die

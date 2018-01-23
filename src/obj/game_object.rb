@@ -47,6 +47,10 @@ class GameObject
     return @state == GameStates::States::DYING
   end
 
+  def blocking?
+    return @state == GameStates::States::BLOCKING
+  end
+
   def die
     $WINDOW.current_map.remove_from_game(self)
   end
