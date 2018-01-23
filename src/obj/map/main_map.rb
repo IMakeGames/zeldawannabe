@@ -309,7 +309,7 @@ class MainMap
                 @enemies << boar
                 @solid_game_objects << boar
               else
-                battie = Boar.new(x*TILE_WIDTH,y*TILE_HEIGHT)
+                battie = Bat.new(x*TILE_WIDTH,y*TILE_HEIGHT)
                 @enemies << battie
               end
             end

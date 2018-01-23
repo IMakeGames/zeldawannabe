@@ -7,7 +7,9 @@ class Mc < Char
     super(x, y, 6, 8, true)
     @id = 1
     @sprite = McSprite.new
-    @char_speed = 1.8
+    @current_speed = 0
+    @acc = 0.3
+    @decel = 0.4
     @recoil_ticks = 20
     @attack_dmg = 1
     @sah = []
@@ -24,15 +26,12 @@ class Mc < Char
     if !$WINDOW.kb_locked
       if $WINDOW.command_stack.empty?
         change_state(GameStates::States::IDLE)
-      elsif $WINDOW.command_stack.last.keys.first == :MOVE
-        change_dir($WINDOW.command_stack.last[:MOVE])
+      elsif $WINDOW.command_stack.last[0] == :MOVE
+        change_dir($WINDOW.command_stack.last[1])
         change_state(GameStates::States::MOVING)
-      elsif $WINDOW.command_stack.last.keys.first == :ATTACK
+      elsif $WINDOW.command_stack.last[0] == :ATTACK
         $WINDOW.kb_locked = true
         attack
-      end
-      if moving?
-        move
       end
     else
       if attacking?
@@ -45,6 +44,13 @@ class Mc < Char
         @event_tiks -= 1
         puts @event_tiks
       end
+    end
+    if moving?
+      @current_speed = @current_speed < 2 ?  @current_speed + @acc : 2
+      move
+    else
+      @current_speed = @current_speed > 0 ?  @current_speed - @decel : 0
+      move
     end
     @invis_frames = @invis_frames > 0 ? @invis_frames - 1 : 0
 
@@ -60,8 +66,8 @@ class Mc < Char
   def impacted(away_from, attack_dmg)
     if @state == GameStates::States::ATTACKING
       @sah.clear
-      $WINDOW.command_stack.delete_if {|hash|
-        hash.keys.last == :ATTACK
+      $WINDOW.command_stack.delete_if {|pair|
+        pair[0] == :ATTACK
       }
     end
     super(away_from, attack_dmg)
@@ -123,8 +129,8 @@ class Mc < Char
     if @event_tiks == 0
       change_state(GameStates::States::IDLE)
       @sah.clear
-      $WINDOW.command_stack.delete_if {|hash|
-        hash.keys.last == :ATTACK
+      $WINDOW.command_stack.delete_if {|pair|
+        pair[0] == :ATTACK
       }
       $WINDOW.kb_locked = false
     end
@@ -165,11 +171,9 @@ class Mc < Char
   end
 
   def drop_picked(type)
-    puts "type " + type.to_s
     if type == HeartDrop
       @current_hp = @current_hp + 4 >= @total_hp ? @total_hp : @current_hp + 4
       $WINDOW.interface.update
-      puts "PLAYER'S HP = #{@current_hp}"
     end
   end
 end

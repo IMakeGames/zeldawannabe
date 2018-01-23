@@ -4,7 +4,7 @@ require_relative 'hit_box'
 
 class Char < GameObject
 
-  attr_accessor :state, :face_dir, :event_tiks, :char_speed, :current_hp, :total_hp, :recoil_ticks, :attack_dmg,
+  attr_accessor :state, :face_dir, :event_tiks, :current_speed, :current_hp, :total_hp, :recoil_ticks, :attack_dmg,
                 :recoil_magnitude, :solid, :invis_frames
 
   def initialize(x, y, w, h, solid)
@@ -103,13 +103,13 @@ class Char < GameObject
   def move
     case @face_dir
       when GameStates::FaceDir::UP
-        move_in_y(char_speed,-1)
+        move_in_y(@current_speed,-1)
       when GameStates::FaceDir::RIGHT
-        move_in_x(char_speed,1)
+        move_in_x(@current_speed,1)
       when GameStates::FaceDir::DOWN
-        move_in_y(char_speed,1)
+        move_in_y(@current_speed,1)
       when GameStates::FaceDir::LEFT
-        move_in_x(char_speed,-1)
+        move_in_x(@current_speed,-1)
     end
   end
 

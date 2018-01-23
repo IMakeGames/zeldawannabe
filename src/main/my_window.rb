@@ -38,15 +38,15 @@ class MyWindow < Gosu::Window
     end
     case id
       when Gosu::KB_LEFT
-        @command_stack << {:MOVE => GameStates::FaceDir::LEFT}
+        @command_stack << [:MOVE, GameStates::FaceDir::LEFT]
       when Gosu::KB_RIGHT
-        @command_stack << {:MOVE => GameStates::FaceDir::RIGHT}
+        @command_stack << [:MOVE, GameStates::FaceDir::RIGHT]
       when Gosu::KB_UP
-        @command_stack << {:MOVE => GameStates::FaceDir::UP}
+        @command_stack << [:MOVE, GameStates::FaceDir::UP]
       when Gosu::KB_DOWN
-        @command_stack << {:MOVE => GameStates::FaceDir::DOWN}
+        @command_stack << [:MOVE, GameStates::FaceDir::DOWN]
       when Gosu::KB_A
-        @kb_locked ? nil : @command_stack << {:ATTACK => Gosu::KB_A}
+        @kb_locked ? nil : @command_stack << [:ATTACK, Gosu::KB_A]
     end
   end
 
@@ -61,8 +61,8 @@ class MyWindow < Gosu::Window
       when Gosu::KB_DOWN
         dir = GameStates::FaceDir::DOWN
     end
-    @command_stack.delete_if {|hash|
-      hash.values.last == dir
+    @command_stack.delete_if {|pair|
+      pair[1] == dir
     }
   end
 
