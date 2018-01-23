@@ -47,6 +47,8 @@ class MyWindow < Gosu::Window
         @command_stack << [:MOVE, GameStates::FaceDir::DOWN]
       when Gosu::KB_A
         @kb_locked ? nil : @command_stack << [:ATTACK, Gosu::KB_A]
+      when Gosu::KB_SPACE
+        @kb_locked ? nil : @command_stack << [:ROLL, Gosu::KB_SPACE]
     end
   end
 

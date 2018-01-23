@@ -88,19 +88,17 @@ class Bat < Char
   end
 
   def decide_what_to_do_next
-    puts "DECIDING WHAT TO DO NEXT"
     dieroll = Random.rand(100)
     if dieroll.between?(0,41)
       @approaching = !@approaching
       change_state(GameStates::States::MOVING)
       @event_tiks = @approaching ? 60 : 15
-      puts "DECIDED TO MOVE"
     else
-      puts "DECIDED TO ATTACK"
       change_state(GameStates::States::ATTACKING)
     end
   end
 
+  #TODO: CREATE IDLE STATE
   def change_state(state)
     super(state)
     case state
@@ -108,20 +106,16 @@ class Bat < Char
       when GameStates::States::ATTACKING
         dieroll = Random.rand(100)
         if dieroll.between?(0, 70)
-          puts "RANDOM ATTACK"
           @attack_type = :random
           calc_randoms
           @event_tiks = 30
         elsif dieroll.between?(71, 100)
-          puts "DART ATTACK"
           @attack_type = :dart
           angle = Gosu.angle($WINDOW.player.hb.x, $WINDOW.player.hb.y, @hb.x, @hb.y)
           @attack_x_speed = Gosu.offset_x(angle, 3)
           @attack_y_speed = Gosu.offset_y(angle, 3)
           @event_tiks = 28
         end
-      when GameStates::States::IDLE
-        puts "STARTED IDLE"
       when GameStates::States::DYING
         @event_tiks = 30
     end

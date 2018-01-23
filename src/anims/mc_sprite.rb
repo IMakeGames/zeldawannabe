@@ -40,6 +40,9 @@ class McSprite < Sprite
         when GameStates::States::DYING
           @loop = true
           @total = 20
+        when   GameStates::States::ROLLING
+          @loop = false
+          @total = 25
       end
 
       @animation = gime_right_anim
@@ -73,11 +76,11 @@ class McSprite < Sprite
     else
       @counter += 1
     end
-      @img.draw(x+@offset_x, y+@offset_y, z)
+      @img.draw(x+@offset_x, y+@offset_y, z, @x_scale)
   end
 
   def init_anim_sprites
-    @imgs = Gosu::Image.load_tiles("../../assets/sprites/MainChar/mc_sprites_18x20.png", 18, 20, retro: true)
+    @imgs = Gosu::Image.load_tiles("../../assets/sprites/MainChar/mc_sprites_18x20_alt.png", 18, 20, retro: true)
     @atk = Gosu::Image.load_tiles("../../assets/sprites/MainChar/sword_attack_29x29_alt2.png", 29, 29, retro: true)
 
     @down_idle_anim = [@imgs[0], @imgs[3], @imgs[4]]
@@ -112,9 +115,9 @@ class McSprite < Sprite
 
     @damaged = [@imgs[39], @imgs[49]]
 
-    @down_rolling = [@imgs[5], @imgs[6], @imgs[7], @imgs[8], @imgs[9]]
-    @side_rolling = [@imgs[15], @imgs[16], @imgs[17], @imgs[18], @imgs[19]]
-    @up_rolling = [@imgs[25], @imgs[26], @imgs[27], @imgs[28], @imgs[29]]
+    @down_rolling = [@imgs[4],@imgs[5], @imgs[6], @imgs[7], @imgs[8], @imgs[9],@imgs[4]]
+    @side_rolling = [@imgs[14],@imgs[15], @imgs[16], @imgs[17], @imgs[18], @imgs[19],@imgs[14]]
+    @up_rolling = [@imgs[24],@imgs[25], @imgs[26], @imgs[27], @imgs[28], @imgs[29],@imgs[24]]
 
     @down_sword_attacking = [@atk[0], @atk[1], @atk[2], @atk[3]]
     @right_sword_attacking = [@atk[4], @atk[5], @atk[6], @atk[7]]
@@ -129,6 +132,7 @@ class McSprite < Sprite
 
   def gime_right_anim
     offset18x20
+    @x_scale = 1
     if recoiling?
       return @damaged
     elsif dying?
@@ -142,6 +146,8 @@ class McSprite < Sprite
             @offset_x = -10
             @offset_y = -14
             return @up_sword_attacking
+          elsif rolling?
+            return @up_rolling
           else
             return @up_idle_anim
           end
@@ -152,6 +158,8 @@ class McSprite < Sprite
             @offset_x = -10
             @offset_y = -8
             return @down_sword_attacking
+          elsif rolling?
+            return @down_rolling
           else
             return @down_idle_anim
           end
@@ -162,6 +170,10 @@ class McSprite < Sprite
             @offset_x = -13
             @offset_y = -8
             return @left_sword_attacking
+          elsif rolling?
+            @x_scale = -1
+            @offset_x = 10
+            return @side_rolling
           else
             return @left_idle_anim
           end
@@ -172,6 +184,8 @@ class McSprite < Sprite
             @offset_x = -10
             @offset_y = -8
             return @right_sword_attacking
+          elsif rolling?
+            return @side_rolling
           else
             return @right_idle_anim
           end
@@ -186,6 +200,10 @@ class McSprite < Sprite
 
   def draw_dead(x,y,z)
     @dead.draw(x+@offset_x+5, y+@offset_y+4, z)
+  end
+
+  def rolling?
+    return @state == GameStates::States::ROLLING
   end
 
 end

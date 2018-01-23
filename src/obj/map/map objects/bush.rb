@@ -1,7 +1,7 @@
 require '../anims/bush_sprite'
 require '../../src/obj/map/droppables/heart_drop'
 class Bush < GameObject
-  MOVEMENT_PERCENTAGE = 25
+  MOVEMENT_PERCENTAGE = 20
 
   def initialize(x, y)
     super(x+4, y+4, 5, 5)
@@ -38,7 +38,7 @@ class Bush < GameObject
     elsif dying?
       if @event_tiks <= 0
         dieroll = Random.rand(100)
-        if dieroll < 30
+        if dieroll < 15
           $WINDOW.current_map.drops << HeartDrop.new(@hb.x,@hb.y)
         end
         die

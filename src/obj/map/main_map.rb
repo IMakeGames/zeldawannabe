@@ -148,7 +148,7 @@ class MainMap
 
     bush          = map_sprites[45]
 
-    f = File.open("../../src/obj/map/map1_layout.txt")
+    f = File.open("../../assets/maps/map1_layout.txt")
     @bg = Gosu.record(600, 600) {
       f.each_with_index do |line, y|
         line.split(",").each_with_index do |n, x|

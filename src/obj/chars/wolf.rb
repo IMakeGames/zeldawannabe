@@ -1,8 +1,7 @@
 require '../../src/obj/chars/char'
 require '../anims/wolf_sprite'
 class Wolf < Char
-  CHAR_ACC = 0.2
-  ATTACK_PROBABILITY = 40
+  ATTACK_PROBABILITY = 50
 
   def initialize(x, y)
     super(x, y, 6, 8, true)
@@ -23,7 +22,7 @@ class Wolf < Char
         change_state(GameStates::States::MOVING)
       end
     elsif moving?
-      move_x = approach($WINDOW.player,1)
+      move_x = approach($WINDOW.player,1.5)
 
       if @until_next_attack_check <= 0
         dieroll = Random.rand(100)
@@ -67,8 +66,8 @@ class Wolf < Char
     @event_tiks -= 1
     if @event_tiks >= 20
       angle = Gosu.angle($WINDOW.player.hb.x, $WINDOW.player.hb.y, @hb.x, @hb.y)
-      @attack_x_speed = Gosu.offset_x(angle,3)
-      @attack_y_speed = Gosu.offset_y(angle,3)
+      @attack_x_speed = Gosu.offset_x(angle,3.5)
+      @attack_y_speed = Gosu.offset_y(angle,3.5)
       if @attack_x_speed < 0
         change_dir( GameStates::FaceDir::RIGHT)
       else

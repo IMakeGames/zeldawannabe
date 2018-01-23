@@ -9,6 +9,7 @@ class Mc < Char
     @sprite = McSprite.new
     @current_speed = 0
     @acc = 0.3
+    @roll_acc = 0.5
     @decel = 0.4
     @recoil_ticks = 20
     @attack_dmg = 1
@@ -18,7 +19,9 @@ class Mc < Char
     change_dir(GameStates::FaceDir::DOWN)
     change_state(GameStates::States::IDLE)
     @recoil_magnitude = 8
-    #@sword_initial_angle = @sia
+    @until_next_attack = 0
+    @until_next_roll = 0
+    #@sia means SWORD INITIAL ANGLE
     @sia = 0
   end
 
@@ -29,16 +32,25 @@ class Mc < Char
       elsif $WINDOW.command_stack.last[0] == :MOVE
         change_dir($WINDOW.command_stack.last[1])
         change_state(GameStates::States::MOVING)
-      elsif $WINDOW.command_stack.last[0] == :ATTACK
+      elsif $WINDOW.command_stack.last[0] == :ATTACK && @until_next_attack <= 0
         $WINDOW.kb_locked = true
         attack
+        @until_next_attack = 7
+      elsif $WINDOW.command_stack.last[0] == :ROLL && @until_next_roll <= 0
+        $WINDOW.kb_locked = true
+        @current_speed = 0
+        change_state(GameStates::States::ROLLING)
+        $WINDOW.command_stack.delete_if{|command| command[0] == :ROLL}
+        @event_tiks = 25
+        @until_next_roll = 15
       end
     else
       if attacking?
         perform_attack
-      end
-      if recoiling?
+      elsif recoiling?
         recoil
+      elsif rolling?
+        roll
       end
       if dying?
         @event_tiks -= 1
@@ -48,11 +60,15 @@ class Mc < Char
     if moving?
       @current_speed = @current_speed < 2 ?  @current_speed + @acc : 2
       move
-    else
+    elsif !rolling?
       @current_speed = @current_speed > 0 ?  @current_speed - @decel : 0
       move
+
     end
+
     @invis_frames = @invis_frames > 0 ? @invis_frames - 1 : 0
+    @until_next_roll = !rolling? && @until_next_roll > 0 ? @until_next_roll - 1 :   @until_next_roll
+    @until_next_attack = !attacking? && @until_next_attack > 0 ? @until_next_attack - 1 : @until_next_attack
 
     $WINDOW.current_map.drops.each do |drop|
       if drop.idle? && drop.hb.check_brute_collision(@hb)
@@ -108,6 +124,22 @@ class Mc < Char
         @sia = 202.5
     end
     rotate_sword(@sia)
+  end
+
+  def roll
+    if @event_tiks.between?(21,25)
+      @current_speed += @roll_acc
+    elsif @event_tiks == 20
+      @invis_frames = 15
+    elsif @event_tiks.between?(0,4)
+      @current_speed -= @roll_acc
+    end
+    move
+    @event_tiks -= 1
+    if @event_tiks <= 0
+      change_state(GameStates::States::IDLE)
+      $WINDOW.kb_locked = false
+    end
   end
 
   def perform_attack
@@ -175,5 +207,9 @@ class Mc < Char
       @current_hp = @current_hp + 4 >= @total_hp ? @total_hp : @current_hp + 4
       $WINDOW.interface.update
     end
+  end
+
+  def rolling?
+    return @state == GameStates::States::ROLLING
   end
 end

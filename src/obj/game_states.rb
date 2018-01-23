@@ -9,6 +9,7 @@ module GameStates
     ROLLING = 6
     DYING = 7
     CUSTOM = 8
+    ROLLING = 9
   end
 
   class FaceDir
