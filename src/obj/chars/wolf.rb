@@ -22,7 +22,7 @@ class Wolf < Char
         change_state(GameStates::States::MOVING)
       end
     elsif moving?
-      move_x = approach($WINDOW.player,1.5)
+      move_x = approach($WINDOW.player,1)
 
       if @until_next_attack_check <= 0
         dieroll = Random.rand(100)

@@ -2,6 +2,8 @@ class Interface
 
   def initialize
     @interface_bg = Gosu::Image.new("../../assets/sprites/Interface/Interface_as_is.png", retro: true)
+    @sword_and_shield = Gosu::Image.load_tiles("../../assets/sprites/Interface/sword_and_shield.png", 18, 18, retro: true)
+    @roll_block = Gosu::Image.load_tiles("../../assets/sprites/Interface/rollblock.png", 24, 9, retro: true)
     @playerHP = $WINDOW.player.current_hp
     @needs_redraw = true
     recalculate_hearts
@@ -12,6 +14,8 @@ class Interface
     if @needs_redraw
       @interface = Gosu.record(267, 60) {
         @interface_bg.draw(0, 0, 0)
+        @sword_and_shield[@sheathed].draw(233,10,1)
+        @roll_block[@sheathed].draw(210,37,1)
         @hearts.each_with_index do |heart, index|
           line = 0
           if index > 8
@@ -32,6 +36,7 @@ class Interface
   end
 
   def update
+    @sheathed = $WINDOW.player.unsheathed ? 0 : 1
     if $WINDOW.player.current_hp <= 0
       @hearts[0].hp = 0
     else

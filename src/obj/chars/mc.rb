@@ -2,7 +2,7 @@ require 'gosu'
 require '../../src/obj/chars/char'
 require '../anims/mc_sprite'
 class Mc < Char
-  attr_reader :unseathed
+  attr_reader :unsheathed
 
   def initialize(x, y)
     super(x, y, 6, 8, true)
@@ -20,7 +20,7 @@ class Mc < Char
     @recoil_magnitude = 8
     @until_next_attack = 0
     @until_next_roll = 0
-    @until_next_seath = 0
+    @until_next_sheath = 0
     #@sia means SWORD INITIAL ANGLE
     @sia = 0
     @unseathed = false
@@ -53,13 +53,14 @@ class Mc < Char
         elsif $WINDOW.command_stack.last[1] == :BLOCK && !blocking?
           change_state(GameStates::States::BLOCKING)
         end
-      elsif !blocking? && $WINDOW.command_stack.last[0] == :SEATH && @until_next_seath <= 0
+      elsif !blocking? && $WINDOW.command_stack.last[0] == :SHEATH && @until_next_sheath <= 0
         $WINDOW.kb_locked = true
-        $WINDOW.command_stack.delete_if{|command| command[0] == :SEATH}
-        change_state(GameStates::States::SEATHING)
-        @unseathed = !@unseathed
+        $WINDOW.command_stack.delete_if{|command| command[0] == :SHEATH}
+        change_state(GameStates::States::SHEATHING)
+        @unsheathed = !@unsheathed
+        $WINDOW.interface.update
         @event_tiks =15
-        @until_next_seath = 15
+        @until_next_SHEATH = 15
       end
     else
       if attacking?
@@ -82,7 +83,7 @@ class Mc < Char
       move
     end
 
-    if seathing?
+    if sheathing?
       @event_tiks -= 1
       if @event_tiks <= 0
         change_state(GameStates::States::IDLE)
@@ -92,7 +93,7 @@ class Mc < Char
     @invis_frames = @invis_frames > 0 ? @invis_frames - 1 : 0
     @until_next_roll = !rolling? && @until_next_roll > 0 ? @until_next_roll - 1 :   @until_next_roll
     @until_next_attack = !attacking? && @until_next_attack > 0 ? @until_next_attack - 1 : @until_next_attack
-    @until_next_seath = !seathing? && @until_next_seath > 0 ? @until_next_seath - 1 : @until_next_seath
+    @until_next_sheath = !sheathing? && @until_next_sheath > 0 ? @until_next_sheath - 1 : @until_next_sheath
 
     $WINDOW.current_map.drops.each do |drop|
       if drop.idle? && drop.hb.check_brute_collision(@hb)
@@ -238,7 +239,7 @@ class Mc < Char
     return @state == GameStates::States::ROLLING
   end
 
-  def seathing?
-   return @state == GameStates::States::SEATHING
+  def sheathing?
+   return @state == GameStates::States::SHEATHING
   end
 end

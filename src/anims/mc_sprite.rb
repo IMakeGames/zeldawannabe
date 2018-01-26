@@ -42,8 +42,8 @@ class McSprite < Sprite
         when   GameStates::States::ROLLING
           @loop = false
           @total = 25
-        when GameStates::States::SEATHING
-          @reverse = $WINDOW.player.unseathed ? true : false
+        when GameStates::States::SHEATHING
+          @reverse = $WINDOW.player.unsheathed ? true : false
           @loop = false
           @total = 15
       end
@@ -91,19 +91,19 @@ class McSprite < Sprite
     @up_idle_anim = [@imgs[20], @imgs[23], @imgs[24]]
     @left_idle_anim = [@imgs[30], @imgs[33], @imgs[34]]
 
-    @down_walking_anim = [@imgs[0], @imgs[1], @imgs[0], @imgs[2]]
-    @right_walking_anim = [@imgs[10], @imgs[11], @imgs[10], @imgs[12]]
-    @up_walking_anim = [@imgs[20], @imgs[21], @imgs[20], @imgs[22]]
-    @left_walking_anim = [@imgs[30], @imgs[31], @imgs[30], @imgs[32]]
+    @down_walking_anim = [@imgs[1], @imgs[0], @imgs[2],@imgs[0]]
+    @right_walking_anim = [@imgs[11], @imgs[10], @imgs[12],@imgs[10]]
+    @up_walking_anim = [@imgs[21], @imgs[20], @imgs[22],@imgs[20]]
+    @left_walking_anim = [@imgs[31], @imgs[30], @imgs[32], @imgs[30]]
 
-    @down_unseath = [@imgs[45], @imgs[46], @imgs[47], @imgs[48]]
-    @down_seath   = [@imgs[48], @imgs[47], @imgs[46], @imgs[45]]
-    @right_unseath = [@imgs[55], @imgs[56], @imgs[57], @imgs[58]]
-    @right_seath  =  [@imgs[58], @imgs[57], @imgs[56], @imgs[55]]
-    @up_unseath = [@imgs[65], @imgs[66], @imgs[67], @imgs[68]]
-    @up_seath   = [@imgs[68], @imgs[67], @imgs[66], @imgs[65]]
-    @left_unseath = [@imgs[75], @imgs[76], @imgs[77], @imgs[78]]
-    @left_seath = [@imgs[78], @imgs[77], @imgs[76], @imgs[75]]
+    @down_unsheath = [@imgs[45], @imgs[46], @imgs[47], @imgs[48]]
+    @down_sheath   = [@imgs[48], @imgs[47], @imgs[46], @imgs[45]]
+    @right_unsheath = [@imgs[55], @imgs[56], @imgs[57], @imgs[58]]
+    @right_sheath  =  [@imgs[58], @imgs[57], @imgs[56], @imgs[55]]
+    @up_unsheath = [@imgs[65], @imgs[66], @imgs[67], @imgs[68]]
+    @up_sheath   = [@imgs[68], @imgs[67], @imgs[66], @imgs[65]]
+    @left_unsheath = [@imgs[75], @imgs[76], @imgs[77], @imgs[78]]
+    @left_sheath = [@imgs[78], @imgs[77], @imgs[76], @imgs[75]]
 
     @down_sword_idle_anim = [@imgs[40], @imgs[43], @imgs[44]]
     @right_sword_idle_anim = [@imgs[50], @imgs[53], @imgs[54]]
@@ -148,39 +148,39 @@ class McSprite < Sprite
       case @face_dir
         when GameStates::FaceDir::UP
           if moving?
-            return $WINDOW.player.unseathed ? @up_sword_walking_anim : @up_walking_anim
+            return $WINDOW.player.unsheathed ? @up_sword_walking_anim : @up_walking_anim
           elsif attacking?
             @offset_x = -10
             @offset_y = -14
             return @up_sword_attacking
           elsif rolling?
             return @up_rolling
-          elsif seathing?
-            return @reverse ? @up_seath : @up_unseath
+          elsif sheathing?
+            return @reverse ? @up_sheath : @up_unsheath
           elsif blocking?
             return @up_block
           else
-            return $WINDOW.player.unseathed ? @up_sword_idle_anim : @up_idle_anim
+            return $WINDOW.player.unsheathed ? @up_sword_idle_anim : @up_idle_anim
           end
         when GameStates::FaceDir::DOWN
           if moving?
-            return $WINDOW.player.unseathed ? @down_sword_walking_anim : @down_walking_anim
+            return $WINDOW.player.unsheathed ? @down_sword_walking_anim : @down_walking_anim
           elsif attacking?
             @offset_x = -10
             @offset_y = -9
             return @down_sword_attacking
           elsif rolling?
             return @down_rolling
-          elsif seathing?
-            return @reverse ? @down_seath : @down_unseath
+          elsif sheathing?
+            return @reverse ? @down_sheath : @down_unsheath
           elsif blocking?
             return @down_block
           else
-            return $WINDOW.player.unseathed ? @down_sword_idle_anim : @down_idle_anim
+            return $WINDOW.player.unsheathed ? @down_sword_idle_anim : @down_idle_anim
           end
         when GameStates::FaceDir::LEFT
           if moving?
-            return $WINDOW.player.unseathed ? @left_sword_walking_anim : @left_walking_anim
+            return $WINDOW.player.unsheathed ? @left_sword_walking_anim : @left_walking_anim
           elsif attacking?
             @offset_x = -13
             @offset_y = -8
@@ -189,28 +189,28 @@ class McSprite < Sprite
             @x_scale = -1
             @offset_x = 10
             return @side_rolling
-          elsif seathing?
-            return @reverse ? @left_seath  : @left_unseath
+          elsif sheathing?
+            return @reverse ? @left_sheath  : @left_unsheath
           elsif blocking?
             return @left_block
           else
-            return $WINDOW.player.unseathed ? @left_sword_idle_anim : @left_idle_anim
+            return $WINDOW.player.unsheathed ? @left_sword_idle_anim : @left_idle_anim
           end
         when GameStates::FaceDir::RIGHT
           if moving?
-            return $WINDOW.player.unseathed ? @right_sword_walking_anim : @right_walking_anim
+            return $WINDOW.player.unsheathed ? @right_sword_walking_anim : @right_walking_anim
           elsif attacking?
             @offset_x = -11
             @offset_y = -8
             return @right_sword_attacking
           elsif rolling?
             return @side_rolling
-          elsif seathing?
-            return @reverse ? @right_seath : @right_unseath
+          elsif sheathing?
+            return @reverse ? @right_sheath : @right_unsheath
           elsif blocking?
             return @right_block
           else
-            return $WINDOW.player.unseathed ? @right_sword_idle_anim : @right_idle_anim
+            return $WINDOW.player.unsheathed ? @right_sword_idle_anim : @right_idle_anim
           end
       end
     end
@@ -229,8 +229,8 @@ class McSprite < Sprite
     return @state == GameStates::States::ROLLING
   end
 
-  def seathing?
-    return @state == GameStates::States::SEATHING
+  def sheathing?
+    return @state == GameStates::States::SHEATHING
   end
 
   def blocking?

@@ -53,7 +53,6 @@ class BatSprite < Sprite
       end
       @counter += 1
 
-      puts "la: #{@frame_num}" unless !dying?
       @img.draw(x + @offset_x, y + @offset_y, z)
 
       if @counter >= @total

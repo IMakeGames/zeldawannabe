@@ -2,6 +2,7 @@ require '../../src/obj/map/tile'
 require '../../src/obj/map/map objects/bush'
 require '../obj/chars/bat'
 require '../obj/chars/boar'
+require '../obj/chars/wolf_boss'
 class MainMap
   TILE_WIDTH = 12
   TILE_HEIGHT = 12
@@ -87,6 +88,15 @@ class MainMap
     end
   end
 
+  def spawn_wolf(x,y)
+    wolfie = Wolf.new(x,y)
+    @enemies << wolfie
+    @solid_game_objects << wolfie
+    set_indices
+    puts "enemies: #{@enemies.count}"
+    return wolfie
+  end
+
   def draw_bg
     map_sprites = Gosu::Image.load_tiles("../../assets/sprites/Mapas/forest_floor_tiles.png", TILE_WIDTH, TILE_HEIGHT, retro: true)
     plain_d = map_sprites[0]
@@ -154,6 +164,7 @@ class MainMap
         line.split(",").each_with_index do |n, x|
           solid = false
           enemy = false
+          boss = false
           case n
             when '1'
               sprite_to_set = plain
@@ -290,6 +301,10 @@ class MainMap
               puts "Monster Set"
               sprite_to_set = plain
               enemy = true
+            when '#'
+              puts "Boss set"
+              sprite_to_set = plain
+              boss = true
           end
           if !sprite_to_set.nil?
             sprite_to_set.draw(x*TILE_WIDTH, y*TILE_HEIGHT, 1)
@@ -312,6 +327,11 @@ class MainMap
                 battie = Bat.new(x*TILE_WIDTH,y*TILE_HEIGHT)
                 @enemies << battie
               end
+            end
+            if boss
+              bossy = WolfBoss.new(x*TILE_WIDTH,y*TILE_HEIGHT)
+              @enemies << bossy
+              @solid_game_objects << bossy
             end
           end
         end

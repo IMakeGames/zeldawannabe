@@ -5,7 +5,7 @@ module GameStates
     IDLE = 2
     ATTACKING = 3
     RECOILING = 4
-    SEATHING = 5
+    SHEATHING = 5
     ROLLING = 6
     DYING = 7
     CUSTOM = 8
