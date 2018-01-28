@@ -4,7 +4,7 @@ class SpittingPlant < Char
   ATTACK_PROBABILITY = 50
 
   def initialize(x, y)
-    super(x, y, 6, 8, true)
+    super(x, y, 10, 20, true)
     @face_dir = GameStates::FaceDir::LEFT
     @sprite = SpittingPlantSprite.new
     change_state(GameStates::States::IDLE)
@@ -12,6 +12,8 @@ class SpittingPlant < Char
     @until_next_attack_check = 100
     @total_hp = 2
     @current_hp = 2
+    @recoil_magnitude = 0
+    @dying_ticks = 40
   end
 
   def change_dir(diff_x,diff_y)
@@ -28,19 +30,19 @@ class SpittingPlant < Char
     end
 
     if idle? && Gosu.distance(@hb.x,@hb.y,$WINDOW.player.hb.x, $WINDOW.player.hb.y) < 100 && @until_next_attack_check <= 0
-      if diff_y.abs <= 75
+      if diff_x.abs < diff_y.abs
         change_dir(diff_x,diff_y)
         @until_next_attack_check = 70
         @face_dir = diff_y >= 0 ? GameStates::FaceDir::DOWN : GameStates::FaceDir::UP
         change_state(GameStates::States::ATTACKING)
-      elsif diff_x.abs <=75
+      else
         change_dir(diff_x,diff_y)
         @until_next_attack_check = 70
         @face_dir = diff_x >= 0 ? GameStates::FaceDir::RIGHT : GameStates::FaceDir::LEFT
         change_state(GameStates::States::ATTACKING)
       end
     elsif attacking? && @event_tiks <= 0
-      PoisonPuff.new(@hb.center[0],@hb.center[1], @face_dir)
+      PoisonPuff.new(@hb.center[0],@hb.y, @face_dir)
       change_state(GameStates::States::IDLE)
     elsif recoiling?
       recoil
@@ -56,6 +58,13 @@ class SpittingPlant < Char
     super(state)
     if state == GameStates::States::ATTACKING
       @event_tiks = 17
+       if @face_dir == GameStates::FaceDir::UP
+          @sprite.attacking = :attacking_top
+       elsif @face_dir == GameStates::FaceDir::DOWN
+         @sprite.attacking = :attacking_bot
+       else
+         @sprite.attacking = :attacking_side
+       end
     end
   end
 end

@@ -1,11 +1,13 @@
 class SpittingPlantSprite < Sprite
 
+  attr_accessor :attacking
   def initialize
     init_anim_sprites
     change_x(GameStates::FaceDir::LEFT)
     change_y(GameStates::FaceDir::DOWN)
     change_state(GameStates::States::IDLE)
     @counter = 0
+    @recoil_counter = 0
     @offset_x = -5
     @offset_y = -5
   end
@@ -18,7 +20,7 @@ class SpittingPlantSprite < Sprite
         @reverse_offset_x = 0
       else
         @x_scale = -1
-        @reverse_offset_x = 15
+        @reverse_offset_x = 20
       end
       @animation = gime_right_anim
     end
@@ -42,11 +44,11 @@ class SpittingPlantSprite < Sprite
           @loop = false
           @total = 25
         when GameStates::States::RECOILING
-          @loop = true
-          @total = 6
+          @recoil = true
+          @recoil_counter = 18
         when GameStates::States::DYING
           @loop = false
-          @total = 20
+          @total = 40
       end
 
       @counter = 0
@@ -69,7 +71,11 @@ class SpittingPlantSprite < Sprite
       @frame_num += 1
     end
 
-    @img.draw(x + @offset_x + @reverse_offset_x, y + @offset_y, z, @x_scale)
+    if @recoil_counter > 0 && @recoil_counter%2 == 0
+      @img.draw(x + @offset_x + @reverse_offset_x, y + @offset_y, z, @x_scale, 1, Gosu::Color::RED)
+    else
+      @img.draw(x + @offset_x + @reverse_offset_x, y + @offset_y, z, @x_scale)
+    end
 
     if @counter >= @total
       if @loop
@@ -77,6 +83,7 @@ class SpittingPlantSprite < Sprite
         @frame_num = 1
       end
     end
+    @recoil_counter = @recoil_counter > 0 ? @recoil_counter - 1 : 0
     @counter += 1
   end
 
@@ -108,6 +115,8 @@ class SpittingPlantSprite < Sprite
       end
     elsif dying?
       return @dying
+    else
+      return @animation
     end
   end
 end

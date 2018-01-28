@@ -2,8 +2,8 @@ class PoisonPuffSprite < Sprite
 
   def initialize
     init_anim_sprites
-    @offset_x = -5
-    @offset_y = -5
+    @offset_x = 0
+    @offset_y = 0
     @counter = 0
     @total = 25
     @frame_duration = (@total/@animation.count).floor
@@ -19,6 +19,7 @@ class PoisonPuffSprite < Sprite
     end
 
     @img.draw(x + @offset_x, y + @offset_y, z)
+    @shadow.draw(x+@offset_x, y + @offset_y + 7, z)
 
     if @counter >= @total
       @counter = 0
@@ -30,5 +31,6 @@ class PoisonPuffSprite < Sprite
   def init_anim_sprites
     @imgs = Gosu::Image.load_tiles("../../assets/sprites/Enemies/projectiles_9x9.png", 9, 9, retro: true)
     @animation = [@imgs[0], @imgs[1], @imgs[2], @imgs[3]]
+    @shadow = @imgs[4]
   end
 end

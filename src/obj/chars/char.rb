@@ -15,6 +15,7 @@ class Char < GameObject
     @recoil_speed_y
     @recoil_magnitude = 4
     @invis_frames = 0
+    @dying_ticks = 20
     @solid = solid
   end
 
@@ -55,7 +56,7 @@ class Char < GameObject
     elsif @event_tiks <= 0
       if @current_hp <=0
         change_state(GameStates::States::DYING)
-        @event_tiks = 20
+        @event_tiks = @dying_ticks
       else
         change_state(GameStates::States::IDLE)
       end
