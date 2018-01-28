@@ -4,7 +4,6 @@ class GameObject
   def initialize(x, y, w, h)
     @sprite = nil
     @hb = HitBox.new(x, y, w, h)
-    @z_rendering = 1
   end
 
   def place(x, y)

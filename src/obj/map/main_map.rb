@@ -3,12 +3,13 @@ require '../../src/obj/map/map objects/bush'
 require '../obj/chars/bat'
 require '../obj/chars/boar'
 require '../obj/chars/wolf_boss'
+require '../obj/chars/spitting_plant'
 class MainMap
   TILE_WIDTH = 12
   TILE_HEIGHT = 12
   TOTAL_HEIGHT = 800
   TOTAL_WIDTH = 800
-  attr_accessor :solid_tiles, :enemies, :solid_game_objects, :bushes, :drops
+  attr_accessor :solid_tiles, :enemies, :solid_game_objects, :bushes, :drops, :projectiles
 
   def initialize
     @solid_tiles = []
@@ -17,6 +18,7 @@ class MainMap
     @bushes = []
     @enemies = []
     @drops = []
+    @projectiles = []
   end
 
   def draw
@@ -34,6 +36,9 @@ class MainMap
       @solid_tiles.each do |tile|
         tile.draw
       end
+    end
+    @projectiles.each do |projectile|
+      projectile.draw
     end
   end
 
@@ -69,6 +74,9 @@ class MainMap
     @drops.each do |drop|
       drop.update unless drop.idle?
     end
+    @projectiles.each do |projectile|
+      projectile.update
+    end
   end
 
   def remove_from_game(obj)
@@ -78,6 +86,8 @@ class MainMap
       @bushes.delete(obj)
     elsif obj.is_a?(HeartDrop)
       @drops.delete(obj)
+    elsif obj.is_a?(Projectile)
+      @projectiles.delete(obj)
     end
     @solid_game_objects.delete_if{|object| object.id == obj.id}
   end
@@ -165,6 +175,7 @@ class MainMap
           solid = false
           enemy = false
           boss = false
+          spitting_plant = false
           case n
             when '1'
               sprite_to_set = plain
@@ -305,6 +316,10 @@ class MainMap
               puts "Boss set"
               sprite_to_set = plain
               boss = true
+            when '&'
+              puts "Spitting Plant Set"
+              sprite_to_set = plain
+              spitting_plant = true
           end
           if !sprite_to_set.nil?
             sprite_to_set.draw(x*TILE_WIDTH, y*TILE_HEIGHT, 1)
@@ -332,6 +347,11 @@ class MainMap
               bossy = WolfBoss.new(x*TILE_WIDTH,y*TILE_HEIGHT)
               @enemies << bossy
               @solid_game_objects << bossy
+            end
+            if spitting_plant
+              spitting_plant = SpittingPlant.new(x*TILE_WIDTH,y*TILE_HEIGHT)
+              @enemies << spitting_plant
+              @solid_game_objects << spitting_plant
             end
           end
         end
