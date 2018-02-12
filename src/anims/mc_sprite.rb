@@ -110,10 +110,10 @@ class McSprite < Sprite
     @up_sword_idle_anim = [@imgs[60], @imgs[63], @imgs[14]]
     @left_sword_idle_anim = [@imgs[70], @imgs[73], @imgs[74]]
 
-    @down_sword_walking_anim = [@imgs[40], @imgs[41], @imgs[42]]
-    @right_sword_walking_anim = [@imgs[50], @imgs[51], @imgs[52]]
-    @up_sword_walking_anim = [@imgs[60], @imgs[61], @imgs[62]]
-    @left_sword_walking_anim = [@imgs[70], @imgs[71], @imgs[72]]
+    @down_sword_walking_anim = [@imgs[41], @imgs[40], @imgs[42], @imgs[40]]
+    @right_sword_walking_anim = [@imgs[51], @imgs[50], @imgs[52], @imgs[50]]
+    @up_sword_walking_anim = [@imgs[61], @imgs[60], @imgs[62], @imgs[60]]
+    @left_sword_walking_anim = [@imgs[71], @imgs[70], @imgs[72], @imgs[70]]
 
     @down_block = [@imgs[35]]
     @right_block = [@imgs[36]]
