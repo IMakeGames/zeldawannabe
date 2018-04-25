@@ -57,7 +57,7 @@ class Char < GameObject
       if @current_hp <=0
         change_state(GameStates::States::DYING)
         @event_tiks = @dying_ticks
-      else
+      elsif !blocking?
         change_state(GameStates::States::IDLE)
       end
     end

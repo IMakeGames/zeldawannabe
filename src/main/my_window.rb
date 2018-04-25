@@ -128,7 +128,7 @@ class MyWindow < Gosu::Window
   end
 
   def draw
-    Gosu.scale(3, 3) {
+    Gosu.scale(3) {
       if @window_state == :game
       @interface.draw
       Gosu.translate(@map_offsetx-1, @map_offsety+59) {

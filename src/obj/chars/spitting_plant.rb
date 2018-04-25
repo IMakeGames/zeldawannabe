@@ -42,7 +42,7 @@ class SpittingPlant < Char
         change_state(GameStates::States::ATTACKING)
       end
     elsif attacking? && @event_tiks <= 0
-      PoisonPuff.new(@hb.center[0],@hb.y, @face_dir)
+      PoisonPuff.new(@hb.center[0],@hb.y+5, @face_dir)
       change_state(GameStates::States::IDLE)
     elsif recoiling?
       recoil

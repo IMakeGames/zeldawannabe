@@ -22,7 +22,7 @@ class MainMap
   end
 
   def draw
-    @bg.draw(1, 1, 1)
+    @bg.draw(0, 0, 0)
     @enemies.each do |enemy|
       enemy.draw
     end

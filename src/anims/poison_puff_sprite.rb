@@ -3,7 +3,7 @@ class PoisonPuffSprite < Sprite
   def initialize
     init_anim_sprites
     @offset_x = 0
-    @offset_y = 0
+    @offset_y = -5
     @counter = 0
     @total = 25
     @frame_duration = (@total/@animation.count).floor
