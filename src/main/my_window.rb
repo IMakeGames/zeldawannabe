@@ -33,7 +33,7 @@ class MyWindow < Gosu::Window
 
     #TODO: DRAWS HITBOXES TO TEST STUFF
     if id == Gosu::KB_H
-      @draw_hb = @draw_hb ? false : true
+      @draw_hb = !@draw_hb
     end
 
     #TODO: DRAWS WHATEVER ELSE NEEDS TESTING
@@ -52,13 +52,13 @@ class MyWindow < Gosu::Window
     if @window_state == :game
       case id
         when Gosu::KB_LEFT
-          @command_stack << [:MOVE, GameStates::FaceDir::LEFT]
+          @command_stack << [:WALK, GameStates::FaceDir::LEFT]
         when Gosu::KB_RIGHT
-          @command_stack << [:MOVE, GameStates::FaceDir::RIGHT]
+          @command_stack << [:WALK, GameStates::FaceDir::RIGHT]
         when Gosu::KB_UP
-          @command_stack << [:MOVE, GameStates::FaceDir::UP]
+          @command_stack << [:WALK, GameStates::FaceDir::UP]
         when Gosu::KB_DOWN
-          @command_stack << [:MOVE, GameStates::FaceDir::DOWN]
+          @command_stack << [:WALK, GameStates::FaceDir::DOWN]
         when Gosu::KB_A
           @kb_locked ? nil : @command_stack << [:ATTACKORITEM, Gosu::KB_A]
           if !@kb_locked
@@ -146,7 +146,6 @@ class MyWindow < Gosu::Window
         @main_menu.draw
       end
     }
-
   end
 
   def init_objects

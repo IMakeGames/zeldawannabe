@@ -5,7 +5,7 @@ class MainMenu
   end
 
   def draw
-    @bg.draw(0, 0, 1)
+    @bg.draw_hitbox(0, 0, 1)
     writer = Writer.new
     writer.draw_text(10, 5, "Hello There\nLetñs suppose that\nI can write two lines\nor three")
   end
@@ -228,7 +228,7 @@ class MainMenu
               next_x = draw_in_x + 6
               letter = @fonts[66]
           end
-          letter.draw(draw_in_x,y+11*linea,10) unless letter == nil
+          letter.draw_hitbox(draw_in_x, y+11*linea, 10) unless letter == nil
           draw_in_x = next_x
         end
         linea += 1

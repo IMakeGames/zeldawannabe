@@ -18,8 +18,8 @@ class PoisonPuffSprite < Sprite
       @frame_num += 1
     end
 
-    @img.draw(x + @offset_x, y + @offset_y, z)
-    @shadow.draw(x+@offset_x, y + @offset_y + 7, z)
+    @img.draw_hitbox(x + @offset_x, y + @offset_y, z)
+    @shadow.draw_hitbox(x+@offset_x, y + @offset_y + 7, z)
 
     if @counter >= @total
       @counter = 0

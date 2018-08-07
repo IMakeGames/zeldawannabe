@@ -13,7 +13,7 @@ class SpittingPlant < Char
     @total_hp = 2
     @current_hp = 2
     @recoil_magnitude = 0
-    @dying_ticks = 40
+    @dying_frames = 40
   end
 
   def change_dir(diff_x,diff_y)

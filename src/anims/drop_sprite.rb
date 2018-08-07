@@ -18,10 +18,10 @@ class DropSprite < Sprite
     if moving?
       @y_pos += @y_vel
       @y_vel += @y_acc
-      @sprite.draw(x-3, @y_pos, z)
+      @sprite.draw_hitbox(x-3, @y_pos, z)
     else
-      @sprite.draw(x-3, y-5, z)
+      @sprite.draw_hitbox(x-3, y-5, z)
     end
-    @shadow.draw(x-3,y-5,z-1)
+    @shadow.draw_hitbox(x-3, y-5, z-1)
   end
 end

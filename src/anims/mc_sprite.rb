@@ -79,7 +79,7 @@ class McSprite < Sprite
     else
       @counter += 1
     end
-      @img.draw(x+@offset_x, y+@offset_y, z, @x_scale)
+      @img.draw_hitbox(x+@offset_x, y+@offset_y, z, @x_scale)
   end
 
   def init_anim_sprites
@@ -222,7 +222,7 @@ class McSprite < Sprite
   end
 
   def draw_dead(x,y,z)
-    @dead.draw(x+@offset_x+5, y+@offset_y+4, z)
+    @dead.draw_hitbox(x+@offset_x+5, y+@offset_y+4, z)
   end
 
   def rolling?

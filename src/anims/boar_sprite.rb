@@ -77,19 +77,19 @@ class BoarSprite < Sprite
         @x_special = -1*@x_special unless @counter > 30
         equis = x-3+@x_special+@reverse_offset_x
         i = y + @offset_y
-        @recoiling.draw(equis,  i, z, @x_scale)
+        @recoiling.draw_hitbox(equis, i, z, @x_scale)
       else
         @y_pos += @y_vel
         @y_vel += @y_acc
         equis = x-3+@reverse_offset_x
         i = @y_pos
-        @recoiling.draw(equis, i, z, @x_scale)
+        @recoiling.draw_hitbox(equis, i, z, @x_scale)
       end
       case @face_dir
         when GameStates::FaceDir::LEFT
-          @shadow.draw(x-3, y-5, 1)
+          @shadow.draw_hitbox(x-3, y-5, 1)
         when GameStates::FaceDir::RIGHT
-          @shadow.draw(x-13, y-5, 1)
+          @shadow.draw_hitbox(x-13, y-5, 1)
       end
     else
       if @counter.between?(@frame_duration*(@frame_num - 1), @frame_duration*@frame_num)
@@ -99,7 +99,7 @@ class BoarSprite < Sprite
       end
       equis = x + @offset_x + @reverse_offset_x
       i = y + @offset_y
-      @img.draw(equis, i, z, @x_scale)
+      @img.draw_hitbox(equis, i, z, @x_scale)
 
       if @counter >= @total
         if @loop
@@ -109,7 +109,7 @@ class BoarSprite < Sprite
       end
     end
     if @impacted && !dying? && @counter%3 == 0
-      @damaged.draw(equis,i,z+1,@x_scale)
+      @damaged.draw_hitbox(equis, i, z+1, @x_scale)
     end
     @counter += 1
   end
@@ -125,7 +125,7 @@ class BoarSprite < Sprite
       @img_pair = @idle_anim[@index]
       @counter = 0
     end
-    @img_pair[0].draw(x + @offset_x + @reverse_offset_x, y + @offset_y, z, @x_scale)
+    @img_pair[0].draw_hitbox(x + @offset_x + @reverse_offset_x, y + @offset_y, z, @x_scale)
   end
 
 

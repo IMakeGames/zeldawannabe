@@ -4,6 +4,7 @@ require '../obj/chars/bat'
 require '../obj/chars/boar'
 require '../obj/chars/wolf_boss'
 require '../obj/chars/spitting_plant'
+
 class MainMap
   TILE_WIDTH = 12
   TILE_HEIGHT = 12
@@ -22,23 +23,23 @@ class MainMap
   end
 
   def draw
-    @bg.draw(0, 0, 0)
+    @bg.draw_hitbox(0, 0, 0)
     @enemies.each do |enemy|
-      enemy.draw
+      enemy.draw_hitbox
     end
     @bushes.each do |bush|
-      bush.draw
+      bush.draw_hitbox
     end
     @drops.each do |drop|
-      drop.draw
+      drop.draw_hitbox
     end
     if $WINDOW.draw_hb
       @solid_tiles.each do |tile|
-        tile.draw
+        tile.draw_hitbox
       end
     end
     @projectiles.each do |projectile|
-      projectile.draw
+      projectile.draw_hitbox
     end
   end
 
@@ -322,7 +323,7 @@ class MainMap
               spitting_plant = true
           end
           if !sprite_to_set.nil?
-            sprite_to_set.draw(x*TILE_WIDTH, y*TILE_HEIGHT, 1)
+            sprite_to_set.draw_hitbox(x*TILE_WIDTH, y*TILE_HEIGHT, 1)
             if solid
               solid_tile = Tile.new(x*TILE_WIDTH, y*TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT)
               @solid_tiles  << solid_tile

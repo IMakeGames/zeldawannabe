@@ -23,7 +23,7 @@ class Projectile < GameObject
     case @allegiance
       when :good
       when :bad
-        if $WINDOW.player.invis_frames <= 0 && !$WINDOW.player.recoiling? && @hb.check_brute_collision($WINDOW.player.hb)
+        if $WINDOW.player.inv_frames <= 0 && !$WINDOW.player.recoiling? && @hb.check_brute_collision($WINDOW.player.hb)
           $WINDOW.player.impacted(@hb.center, @attack_dmg)
           die
         end

@@ -43,3 +43,6 @@
 
 #test file
 /src/main/tests.rb
+
+#doc files
+/doc/

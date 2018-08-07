@@ -76,7 +76,7 @@ class WolfBossSprite < Sprite
         @frame_num += 1
       end
 
-      @img.draw(x + @offset_x + @reverse_offset_x, y + @offset_y, z, @x_scale)
+      @img.draw_hitbox(x + @offset_x + @reverse_offset_x, y + @offset_y, z, @x_scale)
 
       if @counter >= @total
         if @loop
@@ -100,18 +100,18 @@ class WolfBossSprite < Sprite
 
     howling_offset = @counter%2 == 0 && @index == 3 ? 1 : 0
 
-    @img_pair[0].draw(x + @offset_x + @reverse_offset_x + howling_offset, y + @offset_y, z, @x_scale)
+    @img_pair[0].draw_hitbox(x + @offset_x + @reverse_offset_x + howling_offset, y + @offset_y, z, @x_scale)
   end
 
   def animate_attack(x,y,z)
     if @counter < 20
-      @animation[0].draw(x + @offset_x + @reverse_offset_x, y + @offset_y, z, @x_scale)
+      @animation[0].draw_hitbox(x + @offset_x + @reverse_offset_x, y + @offset_y, z, @x_scale)
     elsif @counter.between?(21,27)
-      @animation[1].draw(x + @offset_x + @reverse_offset_x, y + @offset_y, z, @x_scale)
+      @animation[1].draw_hitbox(x + @offset_x + @reverse_offset_x, y + @offset_y, z, @x_scale)
     elsif @counter.between?(28,35)
-      @animation[2].draw(x + @offset_x + @reverse_offset_x, y + @offset_y, z, @x_scale)
+      @animation[2].draw_hitbox(x + @offset_x + @reverse_offset_x, y + @offset_y, z, @x_scale)
     else
-      @animation[3].draw(x + @offset_x + @reverse_offset_x, y + @offset_y, z, @x_scale)
+      @animation[3].draw_hitbox(x + @offset_x + @reverse_offset_x, y + @offset_y, z, @x_scale)
     end
   end
 

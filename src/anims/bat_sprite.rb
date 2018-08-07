@@ -44,7 +44,7 @@ class BatSprite < Sprite
 
   def animate_linear(x, y, z)
     if idle?
-      @img.draw(x + @offset_x, y + @offset_y, z)
+      @img.draw_hitbox(x + @offset_x, y + @offset_y, z)
     else
       if @counter.between?(@frame_duration*(@frame_num - 1), @frame_duration*@frame_num)
         @img = @frame_num - 1 < @animation.count ? @animation[@frame_num -1] : @animation[@animation.count -1]
@@ -53,7 +53,7 @@ class BatSprite < Sprite
       end
       @counter += 1
 
-      @img.draw(x + @offset_x, y + @offset_y, z)
+      @img.draw_hitbox(x + @offset_x, y + @offset_y, z)
 
       if @counter >= @total
         if @loop

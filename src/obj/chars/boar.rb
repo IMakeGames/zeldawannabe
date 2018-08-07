@@ -16,7 +16,7 @@ class Boar < Char
   def impacted(away_from, attack_dmg)
     @current_hp -= attack_dmg
     @sprite.impacted = true
-    @invis_frames = @current_hp > 0 ? 40 : 18
+    @inv_frames = @current_hp > 0 ? 40 : 18
   end
 
   def update
@@ -52,7 +52,7 @@ class Boar < Char
       recoil
     end
 
-    if normal? && $WINDOW.player.invis_frames <= 0 && !$WINDOW.player.recoiling? && @hb.check_brute_collision($WINDOW.player.hb)
+    if normal? && $WINDOW.player.inv_frames <= 0 && !$WINDOW.player.recoiling? && @hb.check_brute_collision($WINDOW.player.hb)
       $WINDOW.player.impacted(@hb.center, @attack_dmg)
     end
 
@@ -62,8 +62,8 @@ class Boar < Char
 
     @event_tiks > 0 ? @event_tiks -= 1 : ((@event_tiks <= 0 && dying?) ? die : @event_tiks = @event_tiks)
 
-    if @invis_frames > 0
-      @invis_frames -= 1
+    if @inv_frames > 0
+      @inv_frames -= 1
     elsif @sprite.impacted && @current_hp <= 0 && !dying?
       change_state(GameStates::States::DYING)
       @event_tiks = 20

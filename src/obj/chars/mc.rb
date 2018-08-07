@@ -1,3 +1,6 @@
+# Main Character object.
+
+
 require 'gosu'
 require '../../src/obj/chars/char'
 require '../anims/mc_sprite'
@@ -12,7 +15,7 @@ class Mc < Char
     @acc = 0.3
     @roll_acc = 0.5
     @decel = 0.4
-    @recoil_ticks = 20
+    @recoil_frames = 20
     @attack_dmg = 1
     @sah = []
     @total_hp = 12
@@ -65,7 +68,7 @@ class Mc < Char
     else
       if attacking?
         perform_attack
-      elsif recoiling? || (blocking? && @invis_frames > 0)
+      elsif recoiling? || (blocking? && @inv_frames > 0)
         recoil
       elsif rolling?
         roll
@@ -94,7 +97,7 @@ class Mc < Char
         $WINDOW.kb_locked = false
       end
     end
-    @invis_frames = @invis_frames > 0 ? @invis_frames - 1 : 0
+    @inv_frames = @inv_frames > 0 ? @inv_frames - 1 : 0
     @until_next_roll = !rolling? && @until_next_roll > 0 ? @until_next_roll - 1 : @until_next_roll
     @until_next_attack = !attacking? && @until_next_attack > 0 ? @until_next_attack - 1 : @until_next_attack
     @until_next_sheath = !sheathing? && @until_next_sheath > 0 ? @until_next_sheath - 1 : @until_next_sheath
@@ -116,7 +119,7 @@ class Mc < Char
       @recoil_speed_x = Gosu.offset_x(angle, @recoil_magnitude)
       @recoil_speed_y = Gosu.offset_y(angle, @recoil_magnitude)
       @event_tiks = @current_hp > 0 ? 16 : 18
-      @invis_frames =  16
+      @inv_frames =  16
     else
       if attacking?
         @sah.clear
@@ -125,7 +128,7 @@ class Mc < Char
         }
       end
       super(away_from, attack_dmg)
-      @invis_frames = 40
+      @inv_frames = 40
     end
     $WINDOW.kb_locked = true
     $WINDOW.interface.update
@@ -169,7 +172,7 @@ class Mc < Char
     if @event_tiks.between?(21, 25)
       @current_speed += @roll_acc
     elsif @event_tiks == 20
-      @invis_frames = 15
+      @inv_frames = 15
     elsif @event_tiks.between?(0, 4)
       @current_speed -= @roll_acc
     end
@@ -186,7 +189,7 @@ class Mc < Char
     rotate_sword(@sia)
     @sah.each do |hb|
       $WINDOW.current_map.enemies.each do |enemy|
-        if !enemy.dying? && ((!enemy.recoiling? && !enemy.is_a?(Boar)) || (enemy.is_a?(Boar) && enemy.invis_frames <= 0)) && hb.check_brute_collision(enemy.hb)
+        if !enemy.dying? && ((!enemy.recoiling? && !enemy.is_a?(Boar)) || (enemy.is_a?(Boar) && enemy.inv_frames <= 0)) && hb.check_brute_collision(enemy.hb)
           enemy.impacted(@hb.center, @attack_dmg)
         end
       end
@@ -215,7 +218,7 @@ class Mc < Char
       super
       if $WINDOW.draw_hb
         @sah.each do |hb|
-          hb.draw
+          hb.draw_hitbox
         end
       end
     end

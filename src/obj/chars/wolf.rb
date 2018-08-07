@@ -48,7 +48,7 @@ class Wolf < Char
       @event_tiks == 0 ? die : @event_tiks -= 1
     end
 
-    if normal? && $WINDOW.player.invis_frames <= 0 && !$WINDOW.player.recoiling? && @hb.check_brute_collision($WINDOW.player.hb)
+    if normal? && $WINDOW.player.inv_frames <= 0 && !$WINDOW.player.recoiling? && @hb.check_brute_collision($WINDOW.player.hb)
       $WINDOW.player.impacted(@hb.center, @attack_dmg)
     end
 

@@ -1,7 +1,7 @@
 module GameStates
 
   class States
-    MOVING = 1
+    WALKING = 1
     IDLE = 2
     ATTACKING = 3
     RECOILING = 4
