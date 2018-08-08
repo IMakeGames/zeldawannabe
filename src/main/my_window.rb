@@ -1,5 +1,5 @@
 require 'gosu'
-require '../../src/obj/chars/mc'
+require '../../src/obj/chars/main_char'
 require '../../src/obj/chars/wolf'
 require '../../src/obj/game_states'
 require '../../src/obj/menu/interface'
@@ -7,7 +7,7 @@ require '../../src/obj/menu/main_menu'
 require '../../src/obj/map/main_map'
 
 class MyWindow < Gosu::Window
-  attr_reader :fps, :draw_hb, :w_height, :w_width, :player, :current_map, :kb_locked, :command_stack, :interface,
+  attr_reader :fps, :draw_hb, :w_height, :w_width, :player, :current_map, :kb_locked, :interface,
               :global_frame_counter, :color_value
   attr_writer :kb_locked
   WINDOW_HEIGHT = 720
@@ -22,7 +22,6 @@ class MyWindow < Gosu::Window
     @half_screen_width = ((WINDOW_WIDTH/3)/2).ceil
     @map_offsetx = 0
     @map_offsety = 0
-    @command_stack = []
     @initializing_map= true
     @kb_locked = false
     @global_frame_counter = 0
@@ -31,48 +30,56 @@ class MyWindow < Gosu::Window
 
   def button_down(id)
 
-    #TODO: DRAWS HITBOXES TO TEST STUFF
+    # H BUTTON DRAWS HITBOXES TO TEST STUFF
     if id == Gosu::KB_H
       @draw_hb = !@draw_hb
     end
 
-    #TODO: DRAWS WHATEVER ELSE NEEDS TESTING
+    # C BUTTON DRAWS WHATEVER ELSE NEEDS TESTING
     if id == Gosu::KB_C
       perform_custom_action
     end
 
+    # D BUTTON CHANGES GAME STATE BETWEEN MENU, GAME, ETC.
     if id == Gosu::KB_D
       if @window_state == :game
-        @command_stack.clear
+        @player.command_stack.clear
         @main_menu = MainMenu.new
       end
       @window_state = @window_state == :game ? :menu : :game
     end
 
+    # DECIDES BUTTON BEHAVIOUR WHEN IN GAME
     if @window_state == :game
-      case id
-        when Gosu::KB_LEFT
-          @command_stack << [:WALK, GameStates::FaceDir::LEFT]
-        when Gosu::KB_RIGHT
-          @command_stack << [:WALK, GameStates::FaceDir::RIGHT]
-        when Gosu::KB_UP
-          @command_stack << [:WALK, GameStates::FaceDir::UP]
-        when Gosu::KB_DOWN
-          @command_stack << [:WALK, GameStates::FaceDir::DOWN]
-        when Gosu::KB_A
-          @kb_locked ? nil : @command_stack << [:ATTACKORITEM, Gosu::KB_A]
-          if !@kb_locked
-            to_add = @player.unsheathed ? [:ATTACKORITEM, :ATTACK] : [:ATTACKORITEM, :ITEM]
-            @command_stack << to_add
-          end
-        when Gosu::KB_SPACE
-          if !@kb_locked
-            to_add = @player.unsheathed ? [:ROLLORBLOCK, :BLOCK] : [:ROLLORBLOCK, :ROLL]
-            @command_stack << to_add
-          end
-        when Gosu::KB_W
-          @kb_locked ? nil : @command_stack << [:SHEATH, Gosu::KB_W]
+      if [Gosu::KB_LEFT, Gosu::KB_RIGHT, Gosu::KB_UP, Gosu::KB_DOWN].include? id
+        case id
+          when Gosu::KB_LEFT
+            @player.command_stack << [:WALK, GameStates::FaceDir::LEFT]
+          when Gosu::KB_RIGHT
+            @player.command_stack << [:WALK, GameStates::FaceDir::RIGHT]
+          when Gosu::KB_UP
+            @player.command_stack << [:WALK, GameStates::FaceDir::UP]
+          when Gosu::KB_DOWN
+            @player.command_stack << [:WALK, GameStates::FaceDir::DOWN]
+        end
+      else
+        #case id
+          # when Gosu::KB_A
+          #   @kb_locked ? nil : @command_stack << [:ATTACKORITEM, Gosu::KB_A]
+          #   if !@kb_locked
+          #     to_add = @player.unsheathed ? [:ATTACKORITEM, :ATTACK] : [:ATTACKORITEM, :ITEM]
+          #     @command_stack << to_add
+          #   end
+          # when Gosu::KB_SPACE
+          #   if !@kb_locked
+          #     to_add = @player.unsheathed ? [:ROLLORBLOCK, :BLOCK] : [:ROLLORBLOCK, :ROLL]
+          #     @command_stack << to_add
+          #   end
+          # when Gosu::KB_W
+          #   @kb_locked ? nil : @command_stack << [:SHEATH, Gosu::KB_W]
+        #end
       end
+      @player.changed_command_stack = true
     elsif @window_state == :menu
     end
 
@@ -89,23 +96,24 @@ class MyWindow < Gosu::Window
           dir = GameStates::FaceDir::UP
         when Gosu::KB_DOWN
           dir = GameStates::FaceDir::DOWN
-        when Gosu::KB_SPACE
-          if @player.blocking?
-            @command_stack.delete_if {|pair|
-              pair[1] == :BLOCK
-            }
-            @player.state = GameStates::States::IDLE
-          end
+        # when Gosu::KB_SPACE
+        #   if @player.blocking?
+        #     @player.command_stack.delete_if {|pair|
+        #       pair[1] == :BLOCK
+        #     }
+        #     @player.state = GameStates::States::IDLE
+        #   end
       end
-      @command_stack.delete_if {|pair|
+      @player.command_stack.delete_if {|pair|
         pair[1] == dir
       }
+      @player.changed_command_stack = true
     end
   end
 
   def update
-    #PLAYER UPDATE
     if @window_state == :game
+      #PLAYER UPDATE
       @player.update unless @player.dead? || @window_state == :menu
 
       #TODO: ADD FIRST HEART SCALING EFFECT
@@ -150,7 +158,7 @@ class MyWindow < Gosu::Window
 
   def init_objects
     @current_map = MainMap.new
-    @player = Mc.new(100, 100)
+    @player = MainChar.new(100, 100)
     @interface = Interface.new
     @interface.update
   end
