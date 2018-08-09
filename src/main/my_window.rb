@@ -72,9 +72,12 @@ class MyWindow < Gosu::Window
               @player.changed_command_stack = true
             end
           when Gosu::KB_SPACE
-            if !@kb_locked && @player.unr_tiks <= 0
-              to_add = @player.unsheathed ? [:ROLLORBLOCK, :BLOCK] : [:ROLLORBLOCK, :ROLL]
-              @player.command_stack << to_add
+            if !@kb_locked
+              if !@player.unsheathed && @player.unr_tiks <= 0
+                @player.command_stack << [:ROLLORBLOCK, :ROLL]
+              elsif @player.unsheathed
+                @player.command_stack << [:ROLLORBLOCK, :BLOCK]
+              end
               @player.changed_command_stack = true
             end
           when Gosu::KB_W
@@ -99,17 +102,17 @@ class MyWindow < Gosu::Window
           dir = GameStates::FaceDir::UP
         when Gosu::KB_DOWN
           dir = GameStates::FaceDir::DOWN
-        # when Gosu::KB_SPACE
-        #   if @player.blocking?
-        #     @player.command_stack.delete_if {|pair|
-        #       pair[1] == :BLOCK
-        #     }
-        #     @player.state = GameStates::States::IDLE
-        #   end
+        when Gosu::KB_SPACE
+          if @player.blocking?
+            @player.command_stack.delete_if {|pair|
+              pair[1] == :BLOCK
+            }
+            @kb_locked = false
+          end
       end
       @player.command_stack.delete_if {|pair|
         pair[1] == dir
-      }
+      } unless dir.nil?
       @player.changed_command_stack = true
     end
   end

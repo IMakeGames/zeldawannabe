@@ -28,13 +28,13 @@ class MainChar < Char
     @attack_dmg = 1                                  # SWORD attack_dmg actually. TODO: MAKE ITEM/ATTACK DEPENDANT RATHER THAN FIXED
     @command_stack = []                              # COMMAND STACK stores the inputed commands that must be performed
     @changed_command_stack = false                   # COMMAND STACK starts unchanged.
-    @sah = []                                        # Sword attack hitboces starts empty
-    @sword = nil
+    @sword = nil                                     # Sword Object asigned to this shit
     @total_hp = @current_hp = 12                     # HP setup by default
     @recoil_magnitude = 8                            # RECOIL MAGNITUDE starts at 8. TODO: MAKE DYNAMIC
     @una_tiks = @unr_tiks = @uns_tiks = 0            # All counters start at 0
-    @sia = 0                                         # SWORD angle starts at 0
     @unsheathed = false                              # Main Char is not unsheathed at start
+    @walking_v = 2                                   # Max walking velocity
+    @diag_walking_v = 2.5                            # Max diagonal walking velocity.
     change_dir(GameStates::FaceDir::DOWN)            # Sets up direction and state for this char and animation
     change_state(GameStates::States::IDLE)           # ^^
   end
@@ -42,7 +42,7 @@ class MainChar < Char
   # Main update Method. Overrides parent update method.
   def update
 
-    if @changed_command_stack && @event_tiks <= 0
+    if !$WINDOW.kb_locked && @changed_command_stack && @event_tiks <= 0
       #================================== WHEN COMMAND HAS CHANGED, NEW EVENT IS SET ==================================
       # If command_stack has changed, eg. if a button has been pressed or released, then enters in this condition
       if @command_stack.last == nil
@@ -61,15 +61,17 @@ class MainChar < Char
           # If command_stack's last entry is a attack action entry, then attack action is called.
           set_attacking_action
         elsif @command_stack.last[0] == :ROLLORBLOCK
-          # If command_stack's last entry is a roll action entry, then roll action is called.
-          set_roll_action
+          # If command_stack's last entry is a roll or shield action entry, then roll or shield action is called.
+          @command_stack.last[1] == :ROLL ?  set_roll_action : set_shield_action
         end
       end
       # Once command_stack's latest entry has been performed, changed_command_stack flag is set to false.
       @changed_command_stack = false
+      #=================================================================================================================
+
 
     elsif @event_tiks > 0 && @event_tiks -1 <= 0
-      #================================== WHEN EVENT HAS ENDED ======================================
+      #================================== WHEN EVENT HAS ENDED =========================================================
       # If event tiks reaches 0 this update, change from last action
       if sheathing?
         # If sheathing or unsheathing, action is taken from command_stack, uns_tiks is set to 15 and keyboard is
@@ -93,10 +95,12 @@ class MainChar < Char
         $WINDOW.kb_locked = false
       end
 
+      #once an event ends, command stack change flag is set to true, so that next action or event is called
       @changed_command_stack = true
+      #=================================================================================================================
     end
 
-    #=================================== SPECIAL MID-EVENT SETTINGS ==================================================
+    #=================================== SPECIAL MID-EVENT SETTINGS ====================================================
 
     if rolling?
       puts "VELOCITY: #{@vect_v}"
@@ -108,14 +112,17 @@ class MainChar < Char
       end
     end
 
+    #===================================================================================================================
+
     super
 
-    #============================== REST OFF TIKS AND CLEAN UP =========================================
+    #============================== REST OFF TIKS AND CLEAN UP =========================================================
     @sword.update unless @sword.nil?
     @uns_tiks -= 1 unless @uns_tiks <= 0
     @una_tiks -= 1 unless @una_tiks <= 0
     @unr_tiks -= 1 unless @unr_tiks <= 0
     @inv_frames -= 1 unless @inv_frames <= 0
+    #===================================================================================================================
   end
 
   #TODO: BLOCKING MUST BE IMPLEMENTED
@@ -201,6 +208,9 @@ class MainChar < Char
       change_state(GameStates::States::SHEATHING)
       @unsheathed = !@unsheathed
       @sprite.unsheathed_state = @unsheathed
+      #walking velocity is set according to whether char is
+      @walking_v = @unsheathed ? 1.5 : 2
+      @diag_walking_v = @unsheathed ? 2 : 2.5
       $WINDOW.interface.update
       @command_stack.delete_if {|pair|
         pair[0] == :SHEATHE_ACTION
@@ -232,6 +242,14 @@ class MainChar < Char
       }
     end
 
+    #Method that sets attacking action. See set_sheathe_action for reference
+    def set_shield_action
+      @vect_acc = -0.3
+      @max_v = 0
+      $WINDOW.kb_locked = true
+      change_state(GameStates::States::BLOCKING)
+    end
+
     # Method that sets walking pattern taking into consideration the content of command_stack
     # TODO: Must fix walking backwards
     def set_walking_pattern
@@ -247,7 +265,7 @@ class MainChar < Char
       if another_walking_command.nil?
         # If there are no other walking commands in command stack, it is assumed that the walking pattern is straight
         @vect_acc = 0.3
-        @max_v = 2
+        @max_v = @walking_v
         case(@command_stack.last[1])
           when GameStates::FaceDir::LEFT
             @vect_angle = 270
@@ -271,10 +289,10 @@ class MainChar < Char
                 change_state(GameStates::States::IDLE)
               when GameStates::FaceDir::UP
                 @vect_angle = 315
-                @max_v = 2.5
+                @max_v = @diag_walking_v
               when GameStates::FaceDir::DOWN
                 @vect_angle = 225
-                @max_v = 2.5
+                @max_v = @diag_walking_v
             end
           when GameStates::FaceDir::RIGHT
             case (another_walking_command[1])
@@ -284,10 +302,10 @@ class MainChar < Char
                 change_state(GameStates::States::IDLE)
               when GameStates::FaceDir::UP
                 @vect_angle = 45
-                @max_v = 2.5
+                @max_v = @diag_walking_v
               when GameStates::FaceDir::DOWN
                 @vect_angle = 135
-                @max_v = 2.5
+                @max_v = @diag_walking_v
             end
           when GameStates::FaceDir::UP
             case (another_walking_command[1])
@@ -297,10 +315,10 @@ class MainChar < Char
                 change_state(GameStates::States::IDLE)
               when GameStates::FaceDir::LEFT
                 @vect_angle = 315
-                @max_v = 2.5
+                @max_v = @diag_walking_v
               when GameStates::FaceDir::RIGHT
                 @vect_angle = 45
-                @max_v = 2.5
+                @max_v = @diag_walking_v
             end
           when GameStates::FaceDir::DOWN
             case (another_walking_command[1])
@@ -310,10 +328,10 @@ class MainChar < Char
                 change_state(GameStates::States::IDLE)
               when GameStates::FaceDir::LEFT
                 @vect_angle = 225
-                @max_v = 2.5
+                @max_v = @diag_walking_v
               when GameStates::FaceDir::RIGHT
                 @vect_angle = 135
-                @max_v = 2.5
+                @max_v = @diag_walking_v
             end
         end
       end
