@@ -43,7 +43,7 @@ class MainChar < Char
   def update
 
     if @changed_command_stack && @event_tiks <= 0
-      #================================== WHEN COMMAND HAS CHANGED AND NO EVENTS ======================================
+      #================================== WHEN COMMAND HAS CHANGED, NEW EVENT IS SET ==================================
       # If command_stack has changed, eg. if a button has been pressed or released, then enters in this condition
       if @command_stack.last == nil
         # If command_stack is empty, then there is no input that must be accounted for
@@ -60,6 +60,9 @@ class MainChar < Char
         elsif @command_stack.last[0] == :ATTACKORITEM
           # If command_stack's last entry is a attack action entry, then attack action is called.
           set_attacking_action
+        elsif @command_stack.last[0] == :ROLLORBLOCK
+          # If command_stack's last entry is a roll action entry, then roll action is called.
+          set_roll_action
         end
       end
       # Once command_stack's latest entry has been performed, changed_command_stack flag is set to false.
@@ -82,92 +85,37 @@ class MainChar < Char
         @sword = nil
         $WINDOW.kb_locked = false
       end
+
+      if rolling?
+        # If sheathing or unsheathing, action is taken from command_stack, uns_tiks is set to 15 and keyboard is
+        # unlocked
+        @unr_tiks = 15
+        $WINDOW.kb_locked = false
+      end
+
+      @changed_command_stack = true
     end
 
-    # if !$WINDOW.kb_locked
-    #   if $WINDOW.command_stack.empty?
-    #     change_state(GameStates::States::IDLE)
-    #   elsif !blocking? && $WINDOW.command_stack.last[0] == :MOVE
-    #     change_dir($WINDOW.command_stack.last[1])
-    #     change_state(GameStates::States::MOVING)
-    #   elsif $WINDOW.command_stack.last[0] == :ATTACKORITEM
-    #     if $WINDOW.command_stack.last[1] == :ATTACK && @una_tiks <= 0
-    #       $WINDOW.kb_locked = true
-    #       attack
-    #       @una_tiks = 7
-    #     else
-    #       $WINDOW.command_stack.delete_if {|command| command[0] == :ATTACKORITEM}
-    #     end
-    #   elsif $WINDOW.command_stack.last[0] == :ROLLORBLOCK
-    #     if $WINDOW.command_stack.last[1] == :ROLL && @unr_tiks <= 0
-    #       $WINDOW.kb_locked = true
-    #       @current_speed = 0
-    #       change_state(GameStates::States::ROLLING)
-    #       $WINDOW.command_stack.delete_if {|command| command[0] == :ROLLORBLOCK}
-    #       @event_tiks = 25
-    #       @unr_tiks = 15
-    #     elsif $WINDOW.command_stack.last[1] == :BLOCK && !blocking?
-    #       change_state(GameStates::States::BLOCKING)
-    #     end
-    #   elsif !blocking? && $WINDOW.command_stack.last[0] == :SHEATH && @uns_tiks <= 0
-    #     $WINDOW.kb_locked = true
-    #     $WINDOW.command_stack.delete_if {|command| command[0] == :SHEATH}
-    #     change_state(GameStates::States::SHEATHING)
-    #     @unsheathed = !@unsheathed
-    #     $WINDOW.interface.update
-    #     @event_tiks =15
-    #     @until_next_SHEATH = 15
-    #   end
-    # else
-    #   if attacking?
-    #     perform_attack
-    #   elsif recoiling? || (blocking? && @inv_frames > 0)
-    #     recoil
-    #   elsif rolling?
-    #     roll
-    #   end
-    #   if dying?
-    #     @event_tiks -= 1
-    #     puts @event_tiks
-    #   end
-    # end
-    # if moving?
-    #   if @unsheathed
-    #     @current_speed = @current_speed < 1.2 ? @current_speed + @acc : 1.2
-    #   else
-    #     @current_speed = @current_speed < 2 ? @current_speed + @acc : 2
-    #   end
-    #   move
-    # elsif !rolling?
-    #   @current_speed = @current_speed > 0 ? @current_speed - @decel : 0
-    #   move
-    # end
-    #
-    # if sheathing?
-    #   @event_tiks -= 1
-    #   if @event_tiks <= 0
-    #     change_state(GameStates::States::IDLE)
-    #     $WINDOW.kb_locked = false
-    #   end
-    # end
-    # @inv_frames = @inv_frames > 0 ? @inv_frames - 1 : 0
-    # @unr_tiks = !rolling? && @unr_tiks > 0 ? @unr_tiks - 1 : @unr_tiks
-    # @una_tiks = !attacking? && @una_tiks > 0 ? @una_tiks - 1 : @una_tiks
-    # @uns_tiks = !sheathing? && @uns_tiks > 0 ? @uns_tiks - 1 : @uns_tiks
-    #
-    # $WINDOW.current_map.drops.each do |drop|
-    #   if drop.idle? && drop.hb.check_brute_collision(@hb)
-    #     drop.die
-    #     drop_picked(drop.class)
-    #   end
-    # end
+    #=================================== SPECIAL MID-EVENT SETTINGS ==================================================
+
+    if rolling?
+      puts "VELOCITY: #{@vect_v}"
+      if @event_tiks == 20
+        @inv_frames = 15
+      elsif @event_tiks == 4
+        @vect_acc = -0.5
+        @max_v = 0
+      end
+    end
 
     super
 
-    #============================== REST OFF TIKS AND CLEAN UP
+    #============================== REST OFF TIKS AND CLEAN UP =========================================
     @sword.update unless @sword.nil?
     @uns_tiks -= 1 unless @uns_tiks <= 0
     @una_tiks -= 1 unless @una_tiks <= 0
+    @unr_tiks -= 1 unless @unr_tiks <= 0
+    @inv_frames -= 1 unless @inv_frames <= 0
   end
 
   #TODO: BLOCKING MUST BE IMPLEMENTED
@@ -204,22 +152,6 @@ class MainChar < Char
     end
     if @event_tiks%2 > 0
       $WINDOW.interface.next_print_red
-    end
-  end
-
-  def roll
-    if @event_tiks.between?(21, 25)
-      @current_speed += @roll_acc
-    elsif @event_tiks == 20
-      @inv_frames = 15
-    elsif @event_tiks.between?(0, 4)
-      @current_speed -= @roll_acc
-    end
-    move
-    @event_tiks -= 1
-    if @event_tiks <= 0
-      change_state(GameStates::States::IDLE)
-      $WINDOW.kb_locked = false
     end
   end
 
@@ -280,11 +212,23 @@ class MainChar < Char
       @vect_acc = -0.3
       @max_v = 0
       $WINDOW.kb_locked = true
-      @event_tiks =11
+      @event_tiks = 11
       change_state(GameStates::States::ATTACKING)
       @sword = SwordObject.new(@face_dir, @hb)
       @command_stack.delete_if {|pair|
         pair[0] == :ATTACKORITEM
+      }
+    end
+
+    #Method that sets rolling action. See set_sheathe_action for reference
+    def set_roll_action
+      @vect_acc = 0.5
+      @max_v = 4.5
+      $WINDOW.kb_locked = true
+      @event_tiks = 20
+      change_state(GameStates::States::ROLLING)
+      @command_stack.delete_if {|pair|
+        pair[0] == :ROLLORBLOCK
       }
     end
 
