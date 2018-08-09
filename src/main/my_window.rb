@@ -51,38 +51,41 @@ class MyWindow < Gosu::Window
 
     # DECIDES BUTTON BEHAVIOUR WHEN IN GAME
     if @window_state == :game
-      if [Gosu::KB_LEFT, Gosu::KB_RIGHT, Gosu::KB_UP, Gosu::KB_DOWN].include? id
         case id
+          #TODO: There musn't be more than 2 walking commands in command_stack.
           when Gosu::KB_LEFT
             @player.command_stack << [:WALK, GameStates::FaceDir::LEFT]
+            @player.changed_command_stack = true
           when Gosu::KB_RIGHT
             @player.command_stack << [:WALK, GameStates::FaceDir::RIGHT]
+            @player.changed_command_stack = true
           when Gosu::KB_UP
             @player.command_stack << [:WALK, GameStates::FaceDir::UP]
+            @player.changed_command_stack = true
           when Gosu::KB_DOWN
             @player.command_stack << [:WALK, GameStates::FaceDir::DOWN]
+            @player.changed_command_stack = true
+          when Gosu::KB_A
+            if !@kb_locked && @player.una_tiks <= 0
+              to_add = @player.unsheathed ? [:ATTACKORITEM, :ATTACK] : [:ATTACKORITEM, :ITEM]
+              @player.command_stack << to_add
+              @player.changed_command_stack = true
+            end
+          when Gosu::KB_SPACE
+            if !@kb_locked && @player.unr_tiks <= 0
+              to_add = @player.unsheathed ? [:ROLLORBLOCK, :BLOCK] : [:ROLLORBLOCK, :ROLL]
+              @player.command_stack << to_add
+              @player.changed_command_stack = true
+            end
+          when Gosu::KB_W
+            if !@kb_locked && @player.uns_tiks <= 0
+              @player.command_stack << [:SHEATHE_ACTION, Gosu::KB_W]
+              @player.changed_command_stack = true
+            end
         end
-      else
-        #case id
-          # when Gosu::KB_A
-          #   @kb_locked ? nil : @command_stack << [:ATTACKORITEM, Gosu::KB_A]
-          #   if !@kb_locked
-          #     to_add = @player.unsheathed ? [:ATTACKORITEM, :ATTACK] : [:ATTACKORITEM, :ITEM]
-          #     @command_stack << to_add
-          #   end
-          # when Gosu::KB_SPACE
-          #   if !@kb_locked
-          #     to_add = @player.unsheathed ? [:ROLLORBLOCK, :BLOCK] : [:ROLLORBLOCK, :ROLL]
-          #     @command_stack << to_add
-          #   end
-          # when Gosu::KB_W
-          #   @kb_locked ? nil : @command_stack << [:SHEATH, Gosu::KB_W]
-        #end
-      end
-      @player.changed_command_stack = true
     elsif @window_state == :menu
+      #TODO: IMPLEMENT MENU FUNCTIONALITY
     end
-
   end
 
   def button_up(id)
