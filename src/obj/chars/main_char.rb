@@ -13,6 +13,7 @@
 #  *changed_command_stack: Indicates whether command_stack has been changed for taking action
 
 require 'gosu'
+require_relative 'sword_object'
 require '../../src/obj/chars/char'
 require '../anims/mc_sprite'
 class MainChar < Char
@@ -28,6 +29,7 @@ class MainChar < Char
     @command_stack = []                              # COMMAND STACK stores the inputed commands that must be performed
     @changed_command_stack = false                   # COMMAND STACK starts unchanged.
     @sah = []                                        # Sword attack hitboces starts empty
+    @sword = nil
     @total_hp = @current_hp = 12                     # HP setup by default
     @recoil_magnitude = 8                            # RECOIL MAGNITUDE starts at 8. TODO: MAKE DYNAMIC
     @una_tiks = @unr_tiks = @uns_tiks = 0            # All counters start at 0
@@ -39,21 +41,47 @@ class MainChar < Char
 
   # Main update Method. Overrides parent update method.
   def update
-    # If command_stack has changed, eg. if a button has been pressed or released, then enters in this loop
-    if @changed_command_stack
-      # If command_stack is empty, then char is performing no action
+
+    if @changed_command_stack && @event_tiks <= 0
+      #================================== WHEN COMMAND HAS CHANGED AND NO EVENTS ======================================
+      # If command_stack has changed, eg. if a button has been pressed or released, then enters in this condition
       if @command_stack.last == nil
+        # If command_stack is empty, then there is no input that must be accounted for
         @vect_acc = -0.3
         @max_v = 0
         change_state(GameStates::States::IDLE)
       else
-        # If command_stack's last entry is a walking entry, then walking pattern is set.
         if @command_stack.last[0] == :WALK
+          # If command_stack's last entry is a walking entry, then walking pattern is set.
           set_walking_pattern
+        elsif @command_stack.last[0] == :SHEATHE_ACTION
+          # If command_stack's last entry is a sheathe action entry, then sheathing action is called.
+          set_sheathe_action
+        elsif @command_stack.last[0] == :ATTACKORITEM
+          # If command_stack's last entry is a attack action entry, then attack action is called.
+          set_attacking_action
         end
       end
       # Once command_stack's latest entry has been performed, changed_command_stack flag is set to false.
       @changed_command_stack = false
+
+    elsif @event_tiks > 0 && @event_tiks -1 <= 0
+      #================================== WHEN EVENT HAS ENDED ======================================
+      # If event tiks reaches 0 this update, change from last action
+      if sheathing?
+        # If sheathing or unsheathing, action is taken from command_stack, uns_tiks is set to 15 and keyboard is
+        # unlocked
+        @uns_tiks = 15
+        $WINDOW.kb_locked = false
+      end
+
+      if attacking?
+        # If sheathing or unsheathing, action is taken from command_stack, uns_tiks is set to 15 and keyboard is
+        # unlocked
+        @una_tiks = 7
+        @sword = nil
+        $WINDOW.kb_locked = false
+      end
     end
 
     # if !$WINDOW.kb_locked
@@ -135,6 +163,11 @@ class MainChar < Char
     # end
 
     super
+
+    #============================== REST OFF TIKS AND CLEAN UP
+    @sword.update unless @sword.nil?
+    @uns_tiks -= 1 unless @uns_tiks <= 0
+    @una_tiks -= 1 unless @una_tiks <= 0
   end
 
   #TODO: BLOCKING MUST BE IMPLEMENTED
@@ -174,26 +207,6 @@ class MainChar < Char
     end
   end
 
-  def attack
-    change_state(GameStates::States::ATTACKING)
-    @event_tiks =11
-
-    #@sword_attack_hitboxes = @sah
-    @sah = [HitBox.new(0, 0, 2, 3), HitBox.new(0, 0, 2, 3)]
-
-    case @face_dir
-      when GameStates::FaceDir::UP
-        @sia = 292.5
-      when GameStates::FaceDir::RIGHT
-        @sia = 22.5
-      when GameStates::FaceDir::DOWN
-        @sia = 112.5
-      when GameStates::FaceDir::LEFT
-        @sia = 202.5
-    end
-    rotate_sword(@sia)
-  end
-
   def roll
     if @event_tiks.between?(21, 25)
       @current_speed += @roll_acc
@@ -210,33 +223,6 @@ class MainChar < Char
     end
   end
 
-  def perform_attack
-    @sia += 10
-    rotate_sword(@sia)
-    @sah.each do |hb|
-      $WINDOW.current_map.enemies.each do |enemy|
-        if !enemy.dying? && ((!enemy.recoiling? && !enemy.is_a?(Boar)) || (enemy.is_a?(Boar) && enemy.inv_frames <= 0)) && hb.check_brute_collision(enemy.hb)
-          enemy.impacted(@hb.center, @attack_dmg)
-        end
-      end
-      $WINDOW.current_map.bushes.each do |bush|
-        if hb.check_brute_collision(bush.hb)
-          bush.impacted
-        end
-      end
-    end
-
-    if @event_tiks == 0
-      change_state(GameStates::States::IDLE)
-      @sah.clear
-      $WINDOW.command_stack.delete_if {|pair|
-        pair[0] == :ATTACK
-      }
-      $WINDOW.kb_locked = false
-    end
-    @event_tiks -= 1
-  end
-
   def draw
     if dead?
       @sprite.draw_dead(@hb.x, @hb.y, @z_rendering)
@@ -248,26 +234,6 @@ class MainChar < Char
         end
       end
     end
-  end
-
-  def rotate_sword(angle)
-    mid_point_adjusted_y = @hb.center[1]
-    mid_point_adjusted_x = @hb.center[0]
-    case @face_dir
-      when GameStates::FaceDir::DOWN
-        mid_point_adjusted_y -= 2
-      when GameStates::FaceDir::LEFT
-        mid_point_adjusted_x -= 3
-      when GameStates::FaceDir::UP
-        mid_point_adjusted_y -= 3
-    end
-    @sah[0].place(mid_point_adjusted_x+Gosu.offset_x(angle, 8), mid_point_adjusted_y+Gosu.offset_y(angle, 8))
-
-    @sah[1].place(mid_point_adjusted_x+Gosu.offset_x(angle, 13), mid_point_adjusted_y+Gosu.offset_y(angle, 14))
-  end
-
-  def dead?
-    return dying? && @event_tiks <= 0
   end
 
   def drop_picked(type)
@@ -286,7 +252,44 @@ class MainChar < Char
   end
 
   private
+
+    # Method that sets sheathe action.
+    def set_sheathe_action
+      # Char is stopped.
+      # KEYBOARD is locked
+      # Event Tiks is set to 15
+      # state is changed to sheathing
+      # unsheathed state is set to opposite of what it was.
+      # animation is also set to that.
+      # interface is updated.
+      @vect_acc = -0.3
+      @max_v = 0
+      $WINDOW.kb_locked = true
+      @event_tiks =15
+      change_state(GameStates::States::SHEATHING)
+      @unsheathed = !@unsheathed
+      @sprite.unsheathed_state = @unsheathed
+      $WINDOW.interface.update
+      @command_stack.delete_if {|pair|
+        pair[0] == :SHEATHE_ACTION
+      }
+    end
+
+    #Method that sets attacking action. See set_sheathe_action for reference
+    def set_attacking_action
+      @vect_acc = -0.3
+      @max_v = 0
+      $WINDOW.kb_locked = true
+      @event_tiks =11
+      change_state(GameStates::States::ATTACKING)
+      @sword = SwordObject.new(@face_dir, @hb)
+      @command_stack.delete_if {|pair|
+        pair[0] == :ATTACKORITEM
+      }
+    end
+
     # Method that sets walking pattern taking into consideration the content of command_stack
+    # TODO: Must fix walking backwards
     def set_walking_pattern
       # First, another walking command is searched for in command stack
       another_walking_command = nil
