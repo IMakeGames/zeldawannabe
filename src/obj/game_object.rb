@@ -8,7 +8,7 @@
 # * sprite: associated Sprite Object
 
 class GameObject
-  attr_accessor :z_rendering, :hb, :id
+  attr_accessor :z_rendering, :hb, :id, :vect_v, :vect_acc, :vect_angle, :max_v
   attr_reader :sprite, :state
 
   # Initializer Method.
@@ -20,6 +20,10 @@ class GameObject
   # An empty sprite is initialized.
   def initialize(x, y, w, h)
     @sprite = nil
+    @vect_v = 0
+    @vect_acc = 0
+    @vect_angle = 180
+    @max_v = 0
     @hb = HitBox.new(x, y, w, h)
   end
 
@@ -34,7 +38,7 @@ class GameObject
   # * If draw_hb variable is true, then calls draw method of hitbox.
   # * Calls linear animation method of sprite
   # * Does not call method if sprite doesn't exists
-  def draw_hitbox
+  def draw
     if $WINDOW.draw_hb
       @hb.draw
     end
@@ -65,8 +69,8 @@ class GameObject
     return @state == GameStates::States::IDLE
   end
 
-  def moving?
-    return @state == GameStates::States::MOVING
+  def walking?
+    return @state == GameStates::States::WALKING
   end
 
   def attacking?
