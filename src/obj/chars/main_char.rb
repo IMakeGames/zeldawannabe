@@ -30,7 +30,7 @@ class MainChar < Char
     @changed_command_stack = false                   # COMMAND STACK starts unchanged.
     @sword = nil                                     # Sword Object asigned to this shit
     @total_hp = @current_hp = 12                     # HP setup by default
-    @recoil_magnitude = 8                            # RECOIL MAGNITUDE starts at 8. TODO: MAKE DYNAMIC
+    @recoil_magnitude = 4                            # RECOIL MAGNITUDE starts at 8. TODO: MAKE DYNAMIC
     @una_tiks = @unr_tiks = @uns_tiks = 0            # All counters start at 0
     @unsheathed = false                              # Main Char is not unsheathed at start
     @walking_v = 2                                   # Max walking velocity
@@ -95,6 +95,9 @@ class MainChar < Char
         $WINDOW.kb_locked = false
       end
 
+      if recoiling?
+        $WINDOW.kb_locked = false
+      end
       #once an event ends, command stack change flag is set to true, so that next action or event is called
       @changed_command_stack = true
       #=================================================================================================================
@@ -103,7 +106,6 @@ class MainChar < Char
     #=================================== SPECIAL MID-EVENT SETTINGS ====================================================
 
     if rolling?
-      puts "VELOCITY: #{@vect_v}"
       if @event_tiks == 20
         @inv_frames = 15
       elsif @event_tiks == 4
@@ -127,25 +129,21 @@ class MainChar < Char
 
   #TODO: BLOCKING MUST BE IMPLEMENTED
   def impacted(away_from, attack_dmg)
-    if blocking?
-      @current_hp = attack_dmg <=2 ? @current_hp : @current_hp - (attack_dmg/2).floor
-      angle = Gosu.angle(away_from[0], away_from[1], @hb.x, @hb.y)
-      @recoil_speed_x = Gosu.offset_x(angle, @recoil_magnitude)
-      @recoil_speed_y = Gosu.offset_y(angle, @recoil_magnitude)
-      @event_tiks = @current_hp > 0 ? 16 : 18
-      @inv_frames =  16
-    else
-      if attacking?
-        @sah.clear
-        $WINDOW.command_stack.delete_if {|pair|
-          pair[0] == :ATTACK
-        }
-      end
-      super(away_from, attack_dmg)
-      @inv_frames = 40
-    end
+    # if blocking?
+    #   @current_hp = attack_dmg <=2 ? @current_hp : @current_hp - (attack_dmg/2).floor
+    #   angle = Gosu.angle(away_from[0], away_from[1], @hb.x, @hb.y)
+    #   @recoil_speed_x = Gosu.offset_x(angle, @recoil_magnitude)
+    #   @recoil_speed_y = Gosu.offset_y(angle, @recoil_magnitude)
+    #   @event_tiks = @current_hp > 0 ? 16 : 18
+    #   @inv_frames =  16
+    # end
     $WINDOW.kb_locked = true
     $WINDOW.interface.update
+    @invis_frames = 20
+    if attacking?
+      @sword = nil
+    end
+    super
     puts "PLAYER'S HP = #{@current_hp}"
   end
 
@@ -168,9 +166,7 @@ class MainChar < Char
     else
       super
       if $WINDOW.draw_hb
-        @sah.each do |hb|
-          hb.draw
-        end
+        @sword.draw_hb
       end
     end
   end

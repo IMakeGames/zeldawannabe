@@ -21,7 +21,7 @@ class Char < GameObject
 
   attr_accessor :face_dir, :event_tiks, :current_speed, :current_hp, :total_hp, :recoil_frames, :attack_dmg,
                 :recoil_magnitude, :solid, :inv_frames
-  attr_reader :recoil_speed_y, :recoil_speed_x, :dying_frames
+  attr_reader   :dying_frames
 
   # Initializer Method
   # params:
@@ -42,6 +42,7 @@ class Char < GameObject
     @solid = solid
   end
 
+
   # Changes the direction the char is facing. Similar to change_state
   # params:
   # - dir: The dir of the new direction.
@@ -61,128 +62,89 @@ class Char < GameObject
   # *Recoil speed in x and y is calculated using the former discussed angle and the recoil magnitude attribute
   # *State is changed to recoiling. This determines many things.
   # *Event Tiks is set equals to the recoil_frames or 18 if the char must die.
+
   def impacted(away_from, attack_dmg)
     @current_hp -= attack_dmg
-    angle = Gosu.angle(away_from[0], away_from[1], @hb.x, @hb.y)
-    @recoil_speed_x = Gosu.offset_x(angle, @recoil_magnitude)
-    @recoil_speed_y = Gosu.offset_y(angle, @recoil_magnitude)
+    @vect_angle = Gosu.angle(away_from[0], away_from[1], @hb.x, @hb.y)
+    @vect_v = @recoil_magnitude
     change_state(GameStates::States::RECOILING)
     @event_tiks = @current_hp > 0 ? @recoil_frames : 18
   end
 
   # Overrides parent class update method.
   # This override only implements unclipping functionality.
+  # It calls basic move function.
   # Each 4 global frames, the character attepts to unclip from other game objects.
   # This action is not performed if the the char is either dying or attacking, or if it has invincibility frames.
+  # It subtracts event tiks.
+  # If event tiks reaches 0, the char's state changes to IDLE, unless current_hp is 0 or below, in which case
+  # the char enters dying state.
   def update
+    move
     if $WINDOW.global_frame_counter%4 == 0 && !(dying? || attacking?) && @inv_frames <= 0
       unclip
     end
-  end
+    @event_tiks -=1 unless @event_tiks <= 0
 
-  # Method that performs recoil behaviour for the char.
-  #
-  def recoil
-    if @event_tiks > (@recoil_frames*0.61).ceil && @event_tiks < (@recoil_frames*0.893).ceil
-      new_hitbox = HitBox.new(@hb.x + @recoil_speed_x, @hb.y + @recoil_speed_y, @hb.w, @hb.h)
-      $WINDOW.current_map.solid_tiles.each do |tile|
-        if tile.hb.check_brute_collision(new_hitbox)
-          @event_tiks -= 1
-          return
-        end
-      end
-      @hb.x += @recoil_speed_x
-      @hb.y += @recoil_speed_y
-    elsif @event_tiks <= 0
-      if @current_hp <=0
-        change_state(GameStates::States::DYING)
-        @event_tiks = @dying_frames
-      elsif !blocking?
-        change_state(GameStates::States::IDLE)
-      end
-    end
-    @event_tiks -=1
-  end
-
-  def approach(object, magnitude)
-    @can_move_x = true
-    @can_move_y = true
-    angle = Gosu.angle(object.hb.x, object.hb.y, @hb.x, @hb.y)
-    move_x = Gosu.offset_x(angle, magnitude)
-    move_y = Gosu.offset_y(angle, magnitude)
-
-    if @solid
-      new_hitbox = HitBox.new(@hb.x - move_x, @hb.y, @hb.w, @hb.h)
-      $WINDOW.current_map.solid_game_objects.each do |ob|
-        next if ob.id == 1 || ob.id == self.id
-        if ob.hb.check_brute_collision(new_hitbox)
-          @can_move_x = false
-          break
-        end
-      end
-
-      new_hitbox = HitBox.new(@hb.x, @hb.y - move_y, @hb.w, @hb.h)
-      $WINDOW.current_map.solid_game_objects.each do |ob|
-        next if ob.id == 1 || ob.id == self.id
-        if ob.hb.check_brute_collision(new_hitbox)
-          @can_move_y = false
-          break
-        end
+    if recoiling? && @vect_v > 0
+      fraction_event_tiks  = @event_tiks.to_f/@recoil_frames.to_f
+      fraction_bigger_than = 1.00/3.00
+      if fraction_event_tiks < fraction_bigger_than
+        @vect_v = 0
       end
     end
 
-    @hb.x = @can_move_x ? @hb.x - move_x : @hb.x
-    @hb.y = @can_move_y ? @hb.y - move_y : @hb.y
-
-    return move_x
+    if @event_tiks <= 0 && @current_hp <=0
+      change_state(GameStates::States::DYING)
+      @event_tiks = @dying_frames
+    end
   end
 
-  def distance_from(object,magnitude)
-    approach(object,-1*magnitude)
-  end
-
+  # Main movement method.
+  # It uses velocity
+  # attributes to determine whether the char can move in both axes.
+  # Changes the position of the hitbox in x and y if it can.
   def move
-    case @face_dir
-      when GameStates::FaceDir::UP
-        move_in_y(@current_speed,-1)
-      when GameStates::FaceDir::RIGHT
-        move_in_x(@current_speed,1)
-      when GameStates::FaceDir::DOWN
-        move_in_y(@current_speed,1)
-      when GameStates::FaceDir::LEFT
-        move_in_x(@current_speed,-1)
-    end
-  end
-
-  def move_in_x(mag,orientation)
-    move_x = mag * orientation
-    new_hitbox = HitBox.new(@hb.x+move_x, @hb.y, @hb.w, @hb.h)
-    $WINDOW.current_map.solid_tiles.each do |tile|
-      if tile.hb.check_brute_collision(new_hitbox)
-        return true
+    if @vect_acc > 0 || @vect_acc < 0
+      if (@vect_acc > 0 && @vect_v < @max_v) || (@vect_acc < 0 && @vect_v > @max_v)
+        @vect_v += @vect_acc
+      else
+        @vect_v = @max_v
+        @vect_acc = 0
       end
     end
-    @hb.x += move_x
-    return false
-  end
-
-  def move_in_y(mag,orientation)
-    move_y = mag*orientation
-    new_hitbox = HitBox.new(@hb.x, @hb.y+move_y, @hb.w, @hb.h)
+    vel_x = Gosu.offset_x(@vect_angle, @vect_v)
+    vel_y = Gosu.offset_y(@vect_angle, @vect_v)
+    can_move_x = true
+    can_move_y = true
+    new_hitbox = HitBox.new(@hb.x+vel_x, @hb.y, @hb.w, @hb.h)
     $WINDOW.current_map.solid_tiles.each do |tile|
       if tile.hb.check_brute_collision(new_hitbox)
-        return true
+        can_move_x = false
       end
     end
-    @hb.y += move_y
-    return false
+
+    new_hitbox = HitBox.new(@hb.x, @hb.y+vel_y, @hb.w, @hb.h)
+    $WINDOW.current_map.solid_tiles.each do |tile|
+      if tile.hb.check_brute_collision(new_hitbox)
+        can_move_y = false
+      end
+    end
+
+    @hb.y += vel_y unless !can_move_x
+    @hb.x += vel_x unless !can_move_y
   end
 
+  # Method thar returns true if the char isn't recoiling or dying.
   def normal?
     return @state != GameStates::States::RECOILING && @state != GameStates::States::DYING
   end
 
-  #TODO: THIS METHOD IS EXPERIMENTAL, IT WILL PROBABLY NEED MUCH MORE WORK. TO DO PENDANT
+  def dead?
+    return dying? && @event_tiks <= 0
+  end
+
+  # This method moves the object so that when it finishes, it wont be clipping with anything
   def unclip
     loop do
       must_do = false
