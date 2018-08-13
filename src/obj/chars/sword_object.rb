@@ -48,4 +48,10 @@ class SwordObject
       end
     end
   end
+
+  def draw_hb
+    @sah.each do |hb|
+      hb.draw
+    end
+  end
 end
