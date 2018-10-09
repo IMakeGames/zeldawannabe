@@ -22,7 +22,7 @@ class Boar < Char
   def update
     if idle?
       if Gosu.distance(@hb.x,@hb.y,$WINDOW.player.hb.x, $WINDOW.player.hb.y) < 75
-        change_state(GameStates::States::MOVING)
+        change_state(GameStates::States::WALKING)
       end
     elsif moving?
       diff_x = $WINDOW.player.hb.center[0] - @hb.center[0]
@@ -75,7 +75,7 @@ class Boar < Char
 
   def recoil
     move(0.7) unless @event_tiks < 15
-    @event_tiks <= 0 ? change_state(GameStates::States::MOVING) : nil
+    @event_tiks <= 0 ? change_state(GameStates::States::WALKING) : nil
   end
 
   def move(magnitude)

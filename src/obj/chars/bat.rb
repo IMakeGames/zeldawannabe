@@ -1,3 +1,8 @@
+# Bat MOB Class Class.
+# Inherits from Char Class
+# Class Attributes:
+#  *
+
 require '../../src/obj/chars/char'
 require '../anims/bat_sprite'
 class Bat < Char
@@ -8,19 +13,24 @@ class Bat < Char
     @sprite = BatSprite.new
     change_state(GameStates::States::IDLE)
     @attack_dmg = 1
-    @total_hp = 2
-    @current_hp = 2
+    @total_hp = @current_hp = 2
     @approaching = true
+    @floater = true
   end
 
+  # Update behavior is different from Main Char's because it checks on update.
   def update
     if idle?
       if Gosu.distance(@hb.x, @hb.y, $WINDOW.player.hb.x, $WINDOW.player.hb.y) < 75
-        change_state(GameStates::States::MOVING)
+        # If distance is 75 or less, behaviour changes to moving
+        change_state(GameStates::States::WALKING)
+        @vect_v = 1.7
+        @vect_angle = Gosu.angle(@hb.x, @hb.y, $WINDOW.player.hb.x, $WINDOW.player.hb.y)
       end
     elsif moving?
       if Gosu.distance(@hb.x, @hb.y, $WINDOW.player.hb.x, $WINDOW.player.hb.y) > 50 && @approaching
-        approach($WINDOW.player,2)
+        # While distance is more than 50, the bat approaches the main character.
+        @vect_angle = Gosu.angle(@hb.x, @hb.y, $WINDOW.player.hb.x, $WINDOW.player.hb.y)
       elsif @event_tiks > 0
         @approaching ? approach($WINDOW.player,1) : distance_from($WINDOW.player,2)
       else
@@ -37,7 +47,7 @@ class Bat < Char
           @hb.y -= @attack_y_speed
         end
       else
-        change_state(GameStates::States::MOVING)
+        change_state(GameStates::States::WALKING)
         @event_tiks = @approaching ? 60 : 15
       end
     elsif recoiling?
@@ -91,7 +101,7 @@ class Bat < Char
     dieroll = Random.rand(100)
     if dieroll.between?(0,41)
       @approaching = !@approaching
-      change_state(GameStates::States::MOVING)
+      change_state(GameStates::States::WALKING)
       @event_tiks = @approaching ? 60 : 15
     else
       change_state(GameStates::States::ATTACKING)
@@ -102,7 +112,7 @@ class Bat < Char
   def change_state(state)
     super(state)
     case state
-      when GameStates::States::MOVING
+      when GameStates::States::WALKING
       when GameStates::States::ATTACKING
         dieroll = Random.rand(100)
         if dieroll.between?(0, 70)

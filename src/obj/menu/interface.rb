@@ -13,16 +13,16 @@ class Interface
   def draw
     if @needs_redraw
       @interface = Gosu.record(267, 60) {
-        @interface_bg.draw_hitbox(0, 0, 0)
-        @sword_and_shield[@sheathed].draw_hitbox(233, 10, 1)
-        @roll_block[@sheathed].draw_hitbox(210, 37, 1)
+        @interface_bg.draw(0, 0, 0)
+        @sword_and_shield[@sheathed].draw(233, 10, 1)
+        @roll_block[@sheathed].draw(210, 37, 1)
         @hearts.each_with_index do |heart, index|
           line = 0
           if index > 8
             index = index - 8
             line = 1
           end
-          heart.draw_hitbox(index, line, 1)
+          heart.draw(index, line, 1)
         end
       }
       @needs_redraw = false
@@ -31,7 +31,7 @@ class Interface
       Gosu.draw_rect(0, 0, 267, 60, Gosu::Color::RED, 100)
       @next_print_red = false
     else
-      @interface.draw_hitbox(0, 0, 100)
+      @interface.draw(0, 0, 100)
     end
   end
 
@@ -88,7 +88,7 @@ class Interface
 
     def draw(n, l, scale)
       ind = 4 - @hp
-      @pieces[ind].draw_hitbox(16 + 11*n, 20+9*l, 3, scale)
+      @pieces[ind].draw(16 + 11*n, 20+9*l, 3, scale)
     end
 
     def empty?

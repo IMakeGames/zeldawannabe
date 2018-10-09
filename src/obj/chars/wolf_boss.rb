@@ -84,7 +84,7 @@ class WolfBoss < Char
       if moving?
         decide_what_to_do_next
       elsif attacking? || idle? || howling?
-        change_state(GameStates::States::MOVING)
+        change_state(GameStates::States::WALKING)
       end
       howling? ? spawn_wolves : nil
     elsif !approaching?

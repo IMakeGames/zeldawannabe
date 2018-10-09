@@ -1,11 +1,11 @@
 class Sprite
-
+  attr_accessor :face_dir
   def idle?
     return @state ==  GameStates::States::IDLE
   end
 
   def moving?
-    return @state ==  GameStates::States::MOVING
+    return @state ==  GameStates::States::WALKING
   end
 
   def attacking?

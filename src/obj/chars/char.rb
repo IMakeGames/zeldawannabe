@@ -12,6 +12,7 @@
 # * solid: Boolean that determines whether the character is solid or no.
 # * inv_frames: Amount of frames during which a character is invincible.
 # * dying_frames: Amount of frames that lasts death animation.
+# * floater: Boolean that determines whether the char floats or not.
 
 require '../../src/obj/game_states'
 require '../../src/obj/game_object'
@@ -21,7 +22,7 @@ class Char < GameObject
 
   attr_accessor :face_dir, :event_tiks, :current_speed, :current_hp, :total_hp, :recoil_frames, :attack_dmg,
                 :recoil_magnitude, :solid, :inv_frames
-  attr_reader   :dying_frames
+  attr_reader   :dying_frames, :floater
 
   # Initializer Method
   # params:
@@ -32,6 +33,7 @@ class Char < GameObject
   # * recoil frames by default is 35 frames, e.g. the character recoils for 35 frames.
   # * Invincibility frames is set to 0 by default.
   # * Dying frames is set to 20 by default, eg. the dying animation of a char lasts 20 frames.
+  # * floater is set to false by default. Only flying enemies should have this set to true.
   def initialize(x, y, w, h, solid)
     super(x, y, w, h)
     @event_tiks = 0
@@ -40,6 +42,7 @@ class Char < GameObject
     @inv_frames = 0
     @dying_frames = 20
     @solid = solid
+    @floater = false
   end
 
 
@@ -131,8 +134,8 @@ class Char < GameObject
       end
     end
 
-    @hb.y += vel_y unless !can_move_x
-    @hb.x += vel_x unless !can_move_y
+    @hb.y += vel_y if can_move_x || @floater
+    @hb.x += vel_x if can_move_y || @floater
   end
 
   # Method thar returns true if the char isn't recoiling or dying.

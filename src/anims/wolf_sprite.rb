@@ -29,7 +29,7 @@ class WolfSprite < Sprite
     if @state != state
       @state = state
       case state
-        when GameStates::States::MOVING
+        when GameStates::States::WALKING
           @loop = true
           @total = WALKING_ANIM_DURATION*$WINDOW.fps
         when GameStates::States::IDLE
@@ -72,7 +72,7 @@ class WolfSprite < Sprite
         @frame_num += 1
       end
 
-      @img.draw_hitbox(x + @offset_x + @reverse_offset_x, y + @offset_y, z, @x_scale)
+      @img.draw(x + @offset_x + @reverse_offset_x, y + @offset_y, z, @x_scale)
 
       if @counter >= @total
         if @loop
@@ -89,10 +89,10 @@ class WolfSprite < Sprite
 
   def animate_attack(x,y,z)
     if @counter < 10
-      @animation[1].draw_hitbox(x + @offset_x + @reverse_offset_x, y + @offset_y, z, @x_scale)
+      @animation[1].draw(x + @offset_x + @reverse_offset_x, y + @offset_y, z, @x_scale)
     elsif @counter <40
       attack_prep_offset = @counter%2 == 0 ? 3 : 0
-      @animation[0].draw_hitbox(x + @offset_x + @reverse_offset_x + attack_prep_offset, y + @offset_y, z, @x_scale)
+      @animation[0].draw(x + @offset_x + @reverse_offset_x + attack_prep_offset, y + @offset_y, z, @x_scale)
     elsif @counter >=40
       change_state(GameStates::States::ATTACKING)
     end

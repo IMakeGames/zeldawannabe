@@ -23,23 +23,23 @@ class MainMap
   end
 
   def draw
-    @bg.draw_hitbox(0, 0, 0)
+    @bg.draw(0, 0, 0)
     @enemies.each do |enemy|
-      enemy.draw_hitbox
+      enemy.draw
     end
     @bushes.each do |bush|
-      bush.draw_hitbox
+      bush.draw
     end
     @drops.each do |drop|
-      drop.draw_hitbox
+      drop.draw
     end
     if $WINDOW.draw_hb
       @solid_tiles.each do |tile|
-        tile.draw_hitbox
+        tile.draw
       end
     end
     @projectiles.each do |projectile|
-      projectile.draw_hitbox
+      projectile.draw
     end
   end
 
@@ -312,7 +312,7 @@ class MainMap
             when '!'
               puts "Monster Set"
               sprite_to_set = plain
-              enemy = true
+              wolf = true
             when '#'
               puts "Boss set"
               sprite_to_set = plain
@@ -323,7 +323,7 @@ class MainMap
               spitting_plant = true
           end
           if !sprite_to_set.nil?
-            sprite_to_set.draw_hitbox(x*TILE_WIDTH, y*TILE_HEIGHT, 1)
+            sprite_to_set.draw(x*TILE_WIDTH, y*TILE_HEIGHT, 1)
             if solid
               solid_tile = Tile.new(x*TILE_WIDTH, y*TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT)
               @solid_tiles  << solid_tile
@@ -353,6 +353,11 @@ class MainMap
               spitting_plant = SpittingPlant.new(x*TILE_WIDTH,y*TILE_HEIGHT)
               @enemies << spitting_plant
               @solid_game_objects << spitting_plant
+            end
+            if wolf
+              wolfie = Wolf.new(x*TILE_WIDTH,y*TILE_HEIGHT)
+              @enemies << wolfie
+              @solid_game_objects << wolfie
             end
           end
         end

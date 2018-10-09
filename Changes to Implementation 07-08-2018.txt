@@ -1,0 +1,9 @@
+Changes I want to implement:
+
+- Subtraction of event tiks must be done on update method. Update method should be the one that determines counter tiks and everything about it.
+
+- Change in recoil method. Total recoil frames should account for the total amount of time the char is in recoil state.
+
+- No more bullshit. All movement should be dictated by movement method.
+
+- Move method should try and perform move using speed variables for axes

@@ -21,7 +21,7 @@ class Bush < GameObject
         #dieroll = Gosu.random(1, 101)
         dieroll =  Random.rand(100)
         if dieroll <= MOVEMENT_PERCENTAGE
-          change_state(GameStates::States::MOVING)
+          change_state(GameStates::States::WALKING)
           @event_tiks =30
         else
           @until_next_movement_check = 75
@@ -29,7 +29,7 @@ class Bush < GameObject
       else
         @until_next_movement_check -= 1
       end
-    elsif moving?
+    elsif !idle?
       if @event_tiks <= 0
         change_state(GameStates::States::IDLE)
         @until_next_movement_check = 100

@@ -4,6 +4,7 @@ class McSprite < Sprite
   IDLE_ANIM_DURATION = 2
   ATTACKING_ANIM_DURATION = 0.25
 
+  attr_accessor :unsheathed_state
   def initialize
     init_anim_sprites
     @counter = 0
@@ -11,6 +12,7 @@ class McSprite < Sprite
     @offset_y = -9
     @loop = true
     @reverse = false
+    @unsheathed_state = false
   end
 
   def change_dir(dir)
@@ -24,7 +26,7 @@ class McSprite < Sprite
     if @state != state
       @state = state
       case state
-        when GameStates::States::MOVING
+        when GameStates::States::WALKING
           @loop = true
           @total = 30
         when GameStates::States::IDLE
@@ -43,7 +45,7 @@ class McSprite < Sprite
           @loop = false
           @total = 25
         when GameStates::States::SHEATHING
-          @reverse = $WINDOW.player.unsheathed ? true : false
+          @reverse = @unsheathed_state ? true : false
           @loop = false
           @total = 15
       end
@@ -79,7 +81,7 @@ class McSprite < Sprite
     else
       @counter += 1
     end
-      @img.draw_hitbox(x+@offset_x, y+@offset_y, z, @x_scale)
+      @img.draw(x+@offset_x, y+@offset_y, z, @x_scale)
   end
 
   def init_anim_sprites
@@ -148,7 +150,7 @@ class McSprite < Sprite
       case @face_dir
         when GameStates::FaceDir::UP
           if moving?
-            return $WINDOW.player.unsheathed ? @up_sword_walking_anim : @up_walking_anim
+            return @unsheathed_state ? @up_sword_walking_anim : @up_walking_anim
           elsif attacking?
             @offset_x = -10
             @offset_y = -14
@@ -160,11 +162,11 @@ class McSprite < Sprite
           elsif blocking?
             return @up_block
           else
-            return $WINDOW.player.unsheathed ? @up_sword_idle_anim : @up_idle_anim
+            return @unsheathed_state ? @up_sword_idle_anim : @up_idle_anim
           end
         when GameStates::FaceDir::DOWN
           if moving?
-            return $WINDOW.player.unsheathed ? @down_sword_walking_anim : @down_walking_anim
+            return @unsheathed_state ? @down_sword_walking_anim : @down_walking_anim
           elsif attacking?
             @offset_x = -10
             @offset_y = -9
@@ -176,11 +178,11 @@ class McSprite < Sprite
           elsif blocking?
             return @down_block
           else
-            return $WINDOW.player.unsheathed ? @down_sword_idle_anim : @down_idle_anim
+            return @unsheathed_state ? @down_sword_idle_anim : @down_idle_anim
           end
         when GameStates::FaceDir::LEFT
           if moving?
-            return $WINDOW.player.unsheathed ? @left_sword_walking_anim : @left_walking_anim
+            return @unsheathed_state ? @left_sword_walking_anim : @left_walking_anim
           elsif attacking?
             @offset_x = -13
             @offset_y = -8
@@ -194,11 +196,11 @@ class McSprite < Sprite
           elsif blocking?
             return @left_block
           else
-            return $WINDOW.player.unsheathed ? @left_sword_idle_anim : @left_idle_anim
+            return @unsheathed_state ? @left_sword_idle_anim : @left_idle_anim
           end
         when GameStates::FaceDir::RIGHT
           if moving?
-            return $WINDOW.player.unsheathed ? @right_sword_walking_anim : @right_walking_anim
+            return @unsheathed_state ? @right_sword_walking_anim : @right_walking_anim
           elsif attacking?
             @offset_x = -11
             @offset_y = -8
@@ -210,7 +212,7 @@ class McSprite < Sprite
           elsif blocking?
             return @right_block
           else
-            return $WINDOW.player.unsheathed ? @right_sword_idle_anim : @right_idle_anim
+            return @unsheathed_state ? @right_sword_idle_anim : @right_idle_anim
           end
       end
     end
@@ -222,7 +224,7 @@ class McSprite < Sprite
   end
 
   def draw_dead(x,y,z)
-    @dead.draw_hitbox(x+@offset_x+5, y+@offset_y+4, z)
+    @dead.draw(x+@offset_x+5, y+@offset_y+4, z)
   end
 
   def rolling?

@@ -72,9 +72,9 @@ class SpittingPlantSprite < Sprite
     end
 
     if @recoil_counter > 0 && @recoil_counter%2 == 0
-      @img.draw_hitbox(x + @offset_x + @reverse_offset_x, y + @offset_y, z, @x_scale, 1, Gosu::Color::RED)
+      @img.draw(x + @offset_x + @reverse_offset_x, y + @offset_y, z, @x_scale, 1, Gosu::Color::RED)
     else
-      @img.draw_hitbox(x + @offset_x + @reverse_offset_x, y + @offset_y, z, @x_scale)
+      @img.draw(x + @offset_x + @reverse_offset_x, y + @offset_y, z, @x_scale)
     end
 
     if @counter >= @total

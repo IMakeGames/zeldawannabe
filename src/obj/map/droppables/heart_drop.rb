@@ -5,7 +5,7 @@ class HeartDrop < GameObject
     super(x+1,y+2,4,4)
     @sprite = DropSprite.new(self)
     @move_x = @hb.x > $WINDOW.player.hb.x ? 0.5 : -0.5
-    change_state(GameStates::States::MOVING)
+    change_state(GameStates::States::WALKING)
     @event_tiks = 30
   end
 
