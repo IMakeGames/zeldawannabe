@@ -85,8 +85,9 @@ class McSprite < Sprite
   end
 
   def init_anim_sprites
-    @imgs = Gosu::Image.load_tiles("../../assets/sprites/MainChar/mc_sprites_18x20_alt.png", 18, 20, retro: true)
-    @atk = Gosu::Image.load_tiles("../../assets/sprites/MainChar/sword_attack_29x29_alt2.png", 29, 29, retro: true)
+    puts "#{Dir.pwd}"
+    @imgs = Gosu::Image.load_tiles("#{Dir.pwd}/assets/sprites/MainChar/mc_sprites_18x20_alt.png", 18, 20, retro: true)
+    @atk = Gosu::Image.load_tiles("#{Dir.pwd}/assets/sprites/MainChar/sword_attack_29x29_alt2.png", 29, 29, retro: true)
 
     @down_idle_anim = [@imgs[0], @imgs[3], @imgs[4]]
     @right_idle_anim = [@imgs[10], @imgs[13], @imgs[14]]

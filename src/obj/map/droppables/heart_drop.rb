@@ -1,4 +1,4 @@
-require '../anims/drop_sprite'
+require_relative'../../anims/drop_sprite'
 class HeartDrop < GameObject
   attr_reader :active
   def initialize(x,y)

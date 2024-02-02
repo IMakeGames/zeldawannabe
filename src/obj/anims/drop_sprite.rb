@@ -1,7 +1,7 @@
 
 class DropSprite < Sprite
   def initialize(type)
-    @imgs = Gosu::Image.load_tiles("../../assets/sprites/Mapas/droppables_9x9.png", 9, 9, retro: true)
+    @imgs = Gosu::Image.load_tiles("#{Dir.pwd}/assets/sprites/Mapas/droppables_9x9.png", 9, 9, retro: true)
     @shadow = @imgs[1]
     if type.is_a?(HeartDrop)
       @sprite = @imgs[0]

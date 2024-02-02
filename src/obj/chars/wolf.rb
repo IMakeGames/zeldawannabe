@@ -12,8 +12,8 @@
 #  *changed_command_stack: Indicates whether command_stack has been changed for taking action
 
 
-require '../../src/obj/chars/char'
-require '../anims/wolf_sprite'
+require_relative'../../obj/chars/char'
+require_relative'../anims/wolf_sprite'
 class Wolf < Char
   ATTACK_PROBABILITY = 0.5
 

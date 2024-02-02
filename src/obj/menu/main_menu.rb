@@ -1,7 +1,7 @@
 class MainMenu
 
   def initialize
-    @bg = Gosu::Image.new("../../assets/sprites/Interface/menu_as_should_be.png", retro: true)
+    @bg = Gosu::Image.new("#{Dir.pwd}/assets/sprites/Interface/menu_as_should_be.png", retro: true)
   end
 
   def draw
@@ -16,7 +16,7 @@ class MainMenu
 
   class Writer
     def initialize
-      @fonts = Gosu::Image.load_tiles("../../assets/sprites/Interface/real_font.png", 9, 11, retro: true)
+      @fonts = Gosu::Image.load_tiles("#{Dir.pwd}/assets/sprites/Interface/real_font.png", 9, 11, retro: true)
     end
 
     def draw_text(x, y, text)

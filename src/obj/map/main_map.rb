@@ -1,9 +1,9 @@
-require '../../src/obj/map/tile'
-require '../../src/obj/map/map objects/bush'
-require '../obj/chars/bat'
-require '../obj/chars/boar'
-require '../obj/chars/wolf_boss'
-require '../obj/chars/spitting_plant'
+require_relative'../../obj/map/tile'
+require_relative'../../obj/map/map objects/bush'
+require_relative'../chars/bat'
+require_relative'../chars/boar'
+require_relative'../chars/wolf_boss'
+require_relative'../chars/spitting_plant'
 
 class MainMap
   TILE_WIDTH = 12
@@ -109,7 +109,7 @@ class MainMap
   end
 
   def draw_bg
-    map_sprites = Gosu::Image.load_tiles("../../assets/sprites/Mapas/forest_floor_tiles.png", TILE_WIDTH, TILE_HEIGHT, retro: true)
+    map_sprites = Gosu::Image.load_tiles("#{Dir.pwd}/assets/sprites/Mapas/forest_floor_tiles.png", TILE_WIDTH, TILE_HEIGHT, retro: true)
     plain_d = map_sprites[0]
     flowers = map_sprites[1]
     stone = map_sprites[2]
@@ -169,7 +169,7 @@ class MainMap
 
     bush          = map_sprites[45]
 
-    f = File.open("../../assets/maps/map1_layout.txt")
+    f = File.open("#{Dir.pwd}/assets/maps/map1_layout.txt")
     @bg = Gosu.record(600, 600) {
       f.each_with_index do |line, y|
         line.split(",").each_with_index do |n, x|

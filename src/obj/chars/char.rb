@@ -14,8 +14,8 @@
 # * dying_frames: Amount of frames that lasts death animation.
 # * floater: Boolean that determines whether the char floats or not.
 
-require '../../src/obj/game_states'
-require '../../src/obj/game_object'
+require_relative'../../obj/game_states'
+require_relative'../../obj/game_object'
 require_relative 'hit_box'
 
 class Char < GameObject

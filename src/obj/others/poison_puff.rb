@@ -1,5 +1,5 @@
 require_relative 'projectile'
-require '../anims/poison_puff_sprite'
+require_relative'../anims/poison_puff_sprite'
 class PoisonPuff < Projectile
 
   def initialize(x,y,dir)

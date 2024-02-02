@@ -29,7 +29,7 @@ class PoisonPuffSprite < Sprite
   end
 
   def init_anim_sprites
-    @imgs = Gosu::Image.load_tiles("../../assets/sprites/Enemies/projectiles_9x9.png", 9, 9, retro: true)
+    @imgs = Gosu::Image.load_tiles("#{Dir.pwd}/assets/sprites/Enemies/projectiles_9x9.png", 9, 9, retro: true)
     @animation = [@imgs[0], @imgs[1], @imgs[2], @imgs[3]]
     @shadow = @imgs[4]
   end

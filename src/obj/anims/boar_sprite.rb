@@ -130,7 +130,7 @@ class BoarSprite < Sprite
 
 
   def init_anim_sprites
-    @imgs = Gosu::Image.load_tiles("../../assets/sprites/Enemies/boar_25x14.png", 25, 14, retro: true)
+    @imgs = Gosu::Image.load_tiles("#{Dir.pwd}/assets/sprites/Enemies/boar_25x14.png", 25, 14, retro: true)
     @idle_anim = [[@imgs[0], 0.3], [@imgs[1], 0.1], [@imgs[2], 0.1], [@imgs[1], 0.1], [@imgs[2], 0.1],[@imgs[0],0.3]]
     @walking_anim = [@imgs[5], @imgs[6]]
     @aware = @imgs[4]

@@ -1,10 +1,10 @@
 require 'gosu'
-require '../../src/obj/chars/main_char'
-require '../../src/obj/chars/wolf'
-require '../../src/obj/game_states'
-require '../../src/obj/menu/interface'
-require '../../src/obj/menu/main_menu'
-require '../../src/obj/map/main_map'
+require_relative '../../src/obj/chars/main_char'
+require_relative '../../src/obj/chars/wolf'
+require_relative '../../src/obj/game_states'
+require_relative '../../src/obj/menu/interface'
+require_relative '../../src/obj/menu/main_menu'
+require_relative '../../src/obj/map/main_map'
 
 class MyWindow < Gosu::Window
   attr_reader :fps, :draw_hb, :w_height, :w_width, :player, :current_map, :kb_locked, :interface,

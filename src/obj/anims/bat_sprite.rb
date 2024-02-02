@@ -65,7 +65,7 @@ class BatSprite < Sprite
   end
 
   def init_anim_sprites
-    @imgs = Gosu::Image.load_tiles("../../assets/sprites/Enemies/bat_21x9.png", 21, 9, retro: true)
+    @imgs = Gosu::Image.load_tiles("#{Dir.pwd}/assets/sprites/Enemies/bat_21x9.png", 21, 9, retro: true)
     @idle = @imgs[2]
     @moving = [@imgs[0], @imgs[1], @imgs[2]]
     @recoiling = [@imgs[5], @imgs[8]]

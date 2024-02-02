@@ -3,8 +3,8 @@
 # Class Attributes:
 #  *
 
-require '../../src/obj/chars/char'
-require '../anims/bat_sprite'
+require_relative'../../obj/chars/char'
+require_relative'../anims/bat_sprite'
 class Bat < Char
   CHAR_ACC = 0.2
 

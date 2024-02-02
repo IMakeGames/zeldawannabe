@@ -1,9 +1,9 @@
 class Interface
 
   def initialize
-    @interface_bg = Gosu::Image.new("../../assets/sprites/Interface/Interface_as_is.png", retro: true)
-    @sword_and_shield = Gosu::Image.load_tiles("../../assets/sprites/Interface/sword_and_shield.png", 18, 18, retro: true)
-    @roll_block = Gosu::Image.load_tiles("../../assets/sprites/Interface/rollblock.png", 24, 9, retro: true)
+    @interface_bg = Gosu::Image.new("#{Dir.pwd}/assets/sprites/Interface/Interface_as_is.png", retro: true)
+    @sword_and_shield = Gosu::Image.load_tiles("#{Dir.pwd}/assets/sprites/Interface/sword_and_shield.png", 18, 18, retro: true)
+    @roll_block = Gosu::Image.load_tiles("#{Dir.pwd}/assets/sprites/Interface/rollblock.png", 24, 9, retro: true)
     @playerHP = $WINDOW.player.current_hp
     @needs_redraw = true
     recalculate_hearts
@@ -82,7 +82,7 @@ class Interface
     attr_accessor :hp, :active
 
     def initialize
-      @pieces = Gosu::Image.load_tiles("../../assets/sprites/Interface/hearts.png", 11, 9, retro: true)
+      @pieces = Gosu::Image.load_tiles("#{Dir.pwd}/assets/sprites/Interface/hearts.png", 11, 9, retro: true)
       @hp = 4
     end
 

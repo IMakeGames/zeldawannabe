@@ -1,4 +1,4 @@
-require '../anims/wolf_boss_sprite'
+require_relative'../anims/wolf_boss_sprite'
 class WolfBoss < Char
   ATTACK_PROBABILITY = 50
   HOWLING_PROBABILITY = 5

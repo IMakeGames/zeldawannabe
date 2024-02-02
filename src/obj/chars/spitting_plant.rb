@@ -1,5 +1,5 @@
-require '../../src/obj/others/poison_puff'
-require '../anims/spitting_plant_sprite'
+require_relative'../../obj/others/poison_puff'
+require_relative'../anims/spitting_plant_sprite'
 class SpittingPlant < Char
   ATTACK_PROBABILITY = 50
 

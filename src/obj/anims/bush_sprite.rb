@@ -26,7 +26,7 @@ class BushSprite < Sprite
   end
 
   def init_anim_sprites
-    @imgs = Gosu::Image.load_tiles("../../assets/sprites/Mapas/bush3.png", 12, 12, retro: true)
+    @imgs = Gosu::Image.load_tiles("#{Dir.pwd}/assets/sprites/Mapas/bush3.png", 12, 12, retro: true)
     @fixed = @imgs[0]
     @animated = [@imgs[1],@imgs[0], @imgs[2]]
     @dying = [@imgs[3], @imgs[4], @imgs[5]]

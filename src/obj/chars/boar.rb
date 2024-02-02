@@ -1,5 +1,5 @@
-require '../../src/obj/chars/char'
-require '../anims/boar_sprite'
+require_relative'../../obj/chars/char'
+require_relative'../anims/boar_sprite'
 class Boar < Char
 
   def initialize(x, y)

@@ -7,10 +7,6 @@
 # Ignore bundler config.
 /.bundle
 
-# Ignore the default SQLite database.
-/db/*.sqlite3
-/db/*.sqlite3-journal
-
 # Ignore all logfiles and tempfiles.
 *.log
 /log/*
@@ -26,23 +22,4 @@
 /.idea/
 *.DS_Store
 
-# Ignore application configuration
-/config/application.yml
-
-/public/assets/**
-/public/assets
-
-/public/uploads
-/public/uploads/**
-
-/public/system/opciones_data/**
-/public/system/opciones_data
-
-/private/**
-/private
-
-#test file
-/src/main/tests.rb
-
-#doc files
-/doc/
+Gemfile.lock

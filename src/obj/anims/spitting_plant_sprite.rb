@@ -88,7 +88,7 @@ class SpittingPlantSprite < Sprite
   end
 
   def init_anim_sprites
-    @imgs = Gosu::Image.load_tiles("../../assets/sprites/Enemies/badass plant_22x24.png", 22, 24, retro: true)
+    @imgs = Gosu::Image.load_tiles("#{Dir.pwd}/assets/sprites/Enemies/badass plant_22x24.png", 22, 24, retro: true)
     @idle_down = [@imgs[0], @imgs[1], @imgs[0], @imgs[2]]
     @idle_up = [@imgs[6], @imgs[7], @imgs[6], @imgs[8]]
     @attacking_side = [@imgs[3], @imgs[4], @imgs[0]]

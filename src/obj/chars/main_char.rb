@@ -14,8 +14,8 @@
 
 require 'gosu'
 require_relative 'sword_object'
-require '../../src/obj/chars/char'
-require '../anims/mc_sprite'
+require_relative'../../obj/chars/char'
+require_relative'../anims/mc_sprite'
 class MainChar < Char
   attr_accessor :changed_command_stack
   attr_reader :unsheathed, :current_speed, :sah, :una_tiks, :unr_tiks, :uns_tiks, :sia, :command_stack

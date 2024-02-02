@@ -1,5 +1,5 @@
-require '../anims/bush_sprite'
-require '../../src/obj/map/droppables/heart_drop'
+require_relative'../../anims/bush_sprite'
+require_relative'../../map/droppables/heart_drop'
 class Bush < GameObject
   MOVEMENT_PERCENTAGE = 20
 
